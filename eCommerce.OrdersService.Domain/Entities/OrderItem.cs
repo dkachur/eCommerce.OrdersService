@@ -1,23 +1,25 @@
-﻿namespace eCommerce.OrdersService.Domain.Entities;
+﻿using eCommerce.OrdersService.Domain.ValueObjects;
+
+namespace eCommerce.OrdersService.Domain.Entities;
 
 public class OrderItem
 {
     public Guid ProductId { get; private set; }
 
-    public decimal UnitPrice { get; private set; }
+    public Money UnitPrice { get; private set; }
 
-    public int Quantity { get; private set; }
+    public Quantity Quantity { get; private set; }
 
-    public decimal TotalPrice { get; private set; }
+    public Money TotalPrice { get; private set; }
 
     public static OrderItem New(Guid productId, decimal unitPrice, int quantity)
     {
         return new()
         {
             ProductId = productId,
-            UnitPrice = unitPrice,
-            Quantity = quantity,
-            TotalPrice = unitPrice * quantity
+            UnitPrice = new Money(unitPrice),
+            Quantity = new Quantity(quantity),
+            TotalPrice = new Money(unitPrice * quantity)
         };
     }
 
@@ -26,9 +28,9 @@ public class OrderItem
         return new()
         {
             ProductId = productId,
-            UnitPrice = unitPrice,
-            Quantity = quantity,
-            TotalPrice = totalPrice
+            UnitPrice = new Money(unitPrice),
+            Quantity = new Quantity(quantity),
+            TotalPrice = new Money(totalPrice)
         };
     }
 

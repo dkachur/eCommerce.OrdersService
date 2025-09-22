@@ -1,4 +1,6 @@
-﻿namespace eCommerce.OrdersService.Domain.Entities;
+﻿using eCommerce.OrdersService.Domain.ValueObjects;
+
+namespace eCommerce.OrdersService.Domain.Entities;
 
 public class Order
 {
@@ -8,32 +10,38 @@ public class Order
 
     public DateTime OrderDate { get; private set; }
 
-    public decimal TotalBill { get; private set; }
+    public Money TotalBill { get; private set; }
 
     public IReadOnlyList<OrderItem> OrderItems => _orderItems.AsReadOnly();
 
     private List<OrderItem> _orderItems = [];
 
-    public static Order New(Guid userId, DateTime orderDate, decimal totalBill, List<OrderItem> orderItems)
+    public static Order New(Guid userId, 
+        DateTime orderDate,
+        List<OrderItem> orderItems)
     {
         return new()
         {
             OrderId = Guid.NewGuid(),
             UserId = userId,
             OrderDate = orderDate,
-            TotalBill = totalBill,
+            TotalBill = new Money(orderItems.Sum(o => o.TotalPrice)),
             _orderItems = orderItems.ToList()
         };
     }
 
-    public static Order Restore(Guid orderId, Guid userId, DateTime orderDate, decimal totalBill, List<OrderItem> orderItems)
+    public static Order Restore(Guid orderId, 
+        Guid userId, 
+        DateTime orderDate, 
+        decimal totalBill, 
+        List<OrderItem> orderItems)
     {
         return new()
         {
             OrderId = orderId,
             UserId = userId,
             OrderDate = orderDate,
-            TotalBill = totalBill,
+            TotalBill = new Money(totalBill),
             _orderItems = orderItems.ToList()
         };
     }
