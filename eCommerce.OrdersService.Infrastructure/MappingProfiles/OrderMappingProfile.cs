@@ -10,7 +10,8 @@ public class OrderMappingProfile : Profile
     {
         CreateMap<Order, OrderDocument>()
             .ForMember(dest => dest.Id, opt => opt.Ignore())
-            .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(o => o.OrderItems));
+            .ForMember(dest => dest.TotalBill, opt => opt.MapFrom(o => o.TotalBill.Value))
+            .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(o => o.OrderItems.ToList()));
 
         CreateMap<OrderDocument, Order>()
             .ConstructUsing(src => Order.Restore(
