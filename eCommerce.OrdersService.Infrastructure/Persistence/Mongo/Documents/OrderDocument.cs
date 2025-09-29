@@ -1,7 +1,7 @@
 ﻿using MongoDB.Bson;
 using MongoDB.Bson.Serialization.Attributes;
 
-namespace eCommerce.OrdersService.Infrastructure.Persistence.Mongo;
+namespace eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Documents;
 
 public class OrderDocument
 {
@@ -17,7 +17,7 @@ public class OrderDocument
     [BsonRepresentation(BsonType.DateTime)]
     public DateTime OrderDate { get; set; }
 
-    [BsonRepresentation(BsonType.Double)]
+    [BsonRepresentation(BsonType.Decimal128)]
     public decimal TotalBill { get; set; }
 
     public List<OrderItemDocument> OrderItems { get; set; } = [];
