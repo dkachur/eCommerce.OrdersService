@@ -13,6 +13,6 @@ public class OrderDtoMappingProfile : Profile
             .ForMember(dest => dest.UserId, opt => opt.MapFrom(o => o.UserId))
             .ForMember(dest => dest.OrderDate, opt => opt.MapFrom(o => o.OrderDate))
             .ForMember(dest => dest.TotalBill, opt => opt.MapFrom(o => o.TotalBill.Value))
-            .ForMember(dest => dest.OrderItemDtos, opt => opt.MapFrom(o => o.OrderItems));
+            .ForMember(dest => dest.OrderItems, opt => opt.MapFrom(o => o.OrderItems));
     }
 }

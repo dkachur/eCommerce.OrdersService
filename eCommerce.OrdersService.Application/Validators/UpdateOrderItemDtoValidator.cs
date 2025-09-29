@@ -1,4 +1,4 @@
-﻿using eCommerce.OrdersService.Application.DTOs;
+﻿using eCommerce.OrdersService.Application.Commands.UpdateOrder;
 using FluentValidation;
 
 namespace eCommerce.OrdersService.Application.Validators;
@@ -7,18 +7,14 @@ public class UpdateOrderItemDtoValidator : AbstractValidator<UpdateOrderItemDto>
 {
     public UpdateOrderItemDtoValidator()
     {
-        RuleFor(o => o.UserId)
+        RuleFor(o => o.ProductId)
             .NotEmpty();
 
-        RuleFor(o => o.OrderDate)
-            .NotEmpty()
-            .GreaterThan(DateTime.Parse("2000-01-01"));
+        RuleFor(o => o.UnitPrice)
+            .InclusiveBetween(0, 9999.99m);
 
-        RuleFor(o => o.AddOrderItemDtos)
-            .NotEmpty();
-
-        RuleForEach(o => o.AddOrderItemDtos)
-            .SetValidator(new AddOrderItemDtoValidator());
+        RuleFor(o => o.Quantity)
+            .InclusiveBetween(1, 100);
     }
 }
 

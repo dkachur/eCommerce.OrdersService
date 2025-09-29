@@ -1,4 +1,4 @@
-﻿using eCommerce.OrdersService.Application.DTOs;
+﻿using eCommerce.OrdersService.Application.Commands.AddOrder;
 using FluentValidation;
 
 namespace eCommerce.OrdersService.Application.Validators;

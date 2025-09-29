@@ -5,4 +5,7 @@ public record OrderDto(
     Guid UserId, 
     DateTime OrderDate,
     decimal TotalBill,
-    List<OrderItemDto> OrderItemDtos);
+    List<OrderItemDto> OrderItems)
+{
+    public OrderDto() : this (default, default, default, default, []) { }
+}

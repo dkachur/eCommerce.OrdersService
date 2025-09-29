@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using eCommerce.OrdersService.Application.DTOs;
+using eCommerce.OrdersService.Application.Commands.UpdateOrder;
 using eCommerce.OrdersService.Domain.Entities;
 
 namespace eCommerce.OrdersService.Application.MappingProfiles;
@@ -9,11 +9,10 @@ public class UpdateOrderDtoMappingProfile: Profile
     public UpdateOrderDtoMappingProfile()
     {
         CreateMap<UpdateOrderDto, Order>()
-            .ConstructUsing((src, ctx) => Order.Restore(
+            .ConstructUsing((src, ctx) => Order.Update(
                 src.OrderId,
                 src.UserId,
                 src.OrderDate,
-                src.TotalBill,
                 ctx.Mapper.Map<List<OrderItem>>(src.UpdateOrderItemDtos)));
     }
 }

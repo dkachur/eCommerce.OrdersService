@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using eCommerce.OrdersService.Application.DTOs;
+using eCommerce.OrdersService.Application.Commands.UpdateOrder;
 using eCommerce.OrdersService.Domain.Entities;
 
 namespace eCommerce.OrdersService.Application.MappingProfiles;

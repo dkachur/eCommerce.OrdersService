@@ -30,6 +30,22 @@ public class Order
         };
     }
 
+    public static Order Update(Guid orderId,
+    Guid userId,
+    DateTime orderDate,
+    List<OrderItem> orderItems)
+    {
+        return new()
+        {
+            OrderId = orderId,
+            UserId = userId,
+            OrderDate = orderDate,
+            TotalBill = new Money(orderItems.Sum(o => o.TotalPrice)),
+            _orderItems = orderItems.ToList()
+        };
+    }
+
+
     public static Order Restore(Guid orderId, 
         Guid userId, 
         DateTime orderDate, 

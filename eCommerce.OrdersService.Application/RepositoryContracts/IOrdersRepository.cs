@@ -11,10 +11,10 @@ public interface IOrdersRepository
     /// Retrieves all orders from the storage.
     /// </summary>
     /// <returns>
-    /// A collection of all <see cref="Order"/> instances.
+    /// A list of all <see cref="Order"/> instances.
     /// If the storage contains no orders, an empty collection is returned.
     /// </returns>
-    Task<IEnumerable<Order>> GetOrdersAsync();
+    Task<List<Order>> GetOrdersAsync(CancellationToken ct = default);
 
     /// <summary>
     /// Retrieves order with the specified ID.
@@ -24,17 +24,17 @@ public interface IOrdersRepository
     /// A <see cref="Order"/> with the specified ID if found;
     /// otherwise, <c>null</c>.
     /// </returns>
-    Task<Order?> GetByIdAsync(Guid id);
+    Task<Order?> GetByIdAsync(Guid id, CancellationToken ct = default);
 
     /// <summary>
     /// Retrieves all orders that contain order item with the specified <paramref name="productId"/>.
     /// </summary>
     /// <param name="productId">The unique identifier of the product.</param>
     /// <returns>
-    /// A collection of <see cref="Order"/> instances that match the search criteria.  
+    /// A list of <see cref="Order"/> instances that match the search criteria.  
     /// If no orders are found, an empty collection is returned.
     /// </returns>
-    Task<IEnumerable<Order>> GetWithProductIdAsync(Guid productId);
+    Task<List<Order>> GetWithProductIdAsync(Guid productId, CancellationToken ct = default);
 
     /// <summary>
     /// Adds order to the storage.
@@ -44,7 +44,7 @@ public interface IOrdersRepository
     /// The added <see cref="Order"/> if adding is successful;
     /// otherwise, <c>null</c>.
     /// </returns>
-    Task<Order?> AddOrderAsync(Order order);
+    Task<Order?> AddOrderAsync(Order order, CancellationToken ct = default);
 
     /// <summary>
     /// Updates order in the storage.
@@ -54,7 +54,7 @@ public interface IOrdersRepository
     /// The updated <see cref="Order"/> if updation is successful;
     /// otherwise, <c>null</c>.
     /// </returns>
-    Task<Order?> UpdateOrderAsync(Order order);
+    Task<Order?> UpdateOrderAsync(Order order, CancellationToken ct = default);
 
     /// <summary>
     /// Deletes order with the specified ID from the storage.
@@ -64,5 +64,5 @@ public interface IOrdersRepository
     /// <c>true</c> if delition is successful;
     /// otherwise, <c>false.</c>
     /// </returns>
-    Task<bool> DeleteOrderAsync(Guid id);
+    Task<bool> DeleteOrderAsync(Guid id, CancellationToken ct = default);
 }

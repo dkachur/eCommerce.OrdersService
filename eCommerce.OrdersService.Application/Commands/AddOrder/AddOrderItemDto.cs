@@ -1,4 +1,4 @@
-﻿namespace eCommerce.OrdersService.Application.DTOs;
+﻿namespace eCommerce.OrdersService.Application.Commands.AddOrder;
 
 public record AddOrderItemDto(
     Guid ProductId, 
