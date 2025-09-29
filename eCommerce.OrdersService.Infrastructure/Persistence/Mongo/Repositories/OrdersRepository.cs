@@ -60,7 +60,7 @@ public class OrdersRepository : IOrdersRepository
         return _mapper.Map<List<Order>>(docs);
     }
 
-    public async Task<List<Order>> GetWithProductIdAsync(Guid productId, CancellationToken ct = default)
+    public async Task<List<Order>> GetByProductIdAsync(Guid productId, CancellationToken ct = default)
     {
         var filter = Builders<OrderDocument>.Filter.ElemMatch(
             d => d.OrderItems, 
@@ -71,19 +71,22 @@ public class OrdersRepository : IOrdersRepository
         return _mapper.Map<List<Order>>(docs);
     }
 
+    public async Task<List<Order>> GetByOrderDate(DateTime orderDate, CancellationToken ct = default)
+    {
+        var start = orderDate.Date;
+        var end = start.AddDays(1).AddTicks(-1);
+
+        var filter = Builders<OrderDocument>.Filter.And(
+            Builders<OrderDocument>.Filter.Gte(d => d.OrderDate, start), 
+            Builders<OrderDocument>.Filter.Lte(d => d.OrderDate, end)
+        );
+
+        var docs = await _collection.Find(filter).ToListAsync(ct);
+        return _mapper.Map<List<Order>>(docs);
+    }
+
     public async Task<Order?> UpdateOrderAsync(Order order, CancellationToken ct = default)
     {
-        //var replacement = _mapper.Map<OrderDocument>(order);
-        //var options = new FindOneAndReplaceOptions<OrderDocument>()
-        //{
-        //    ReturnDocument = ReturnDocument.After,
-        //    IsUpsert = false,
-        //};
-
-        //var filter = Builders<OrderDocument>.Filter.Eq(d => d.OrderId, order.OrderId);
-        //var updatedDoc = await _collection.FindOneAndReplaceAsync(filter, replacement, options, ct);
-        //return updatedDoc is null ? null : _mapper.Map<Order>(updatedDoc);
-
         var filter = Builders<OrderDocument>.Filter.Eq(f => f.OrderId, order.OrderId);
         var update = Builders<OrderDocument>.Update
             .Set(d => d.UserId, order.UserId)
