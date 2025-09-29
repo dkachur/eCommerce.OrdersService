@@ -34,7 +34,17 @@ public interface IOrdersRepository
     /// A list of <see cref="Order"/> instances that match the search criteria.  
     /// If no orders are found, an empty collection is returned.
     /// </returns>
-    Task<List<Order>> GetWithProductIdAsync(Guid productId, CancellationToken ct = default);
+    Task<List<Order>> GetByProductIdAsync(Guid productId, CancellationToken ct = default);
+
+    /// <summary>
+    /// Retrieves all orders that were made at the specified date.
+    /// </summary>
+    /// <param name="orderDate">The date of the orders.</param>
+    /// <returns>
+    /// A list of <see cref="Order"/> instances that match the search criteria.  
+    /// If no orders are found, an empty collection is returned.
+    /// </returns>
+    Task<List<Order>> GetByOrderDate(DateTime orderDate, CancellationToken ct = default);
 
     /// <summary>
     /// Adds order to the storage.

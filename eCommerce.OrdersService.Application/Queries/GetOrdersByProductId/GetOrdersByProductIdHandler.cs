@@ -17,10 +17,10 @@ public class GetOrdersByProductIdHandler : IRequestHandler<GetOrdersByProductIdQ
         _mapper = mapper;
     }
 
-    public async Task<Result<List<OrderDto>>> Handle(GetOrdersByProductIdQuery request, CancellationToken cancellationToken)
+    public async Task<Result<List<OrderDto>>> Handle(GetOrdersByProductIdQuery request, CancellationToken ct)
     {
         var productId = request.ProductId;
-        var orders = await _repo.GetWithProductIdAsync(productId);
+        var orders = await _repo.GetByProductIdAsync(productId, ct);
         var orderDtos = _mapper.Map<List<OrderDto>>(orders);
         return Result.Ok(orderDtos);
     }
