@@ -7,6 +7,7 @@ using eCommerce.OrdersService.Application.Commands.UpdateOrder;
 using eCommerce.OrdersService.Application.DTOs;
 using eCommerce.OrdersService.Application.Queries.GetOrderById;
 using eCommerce.OrdersService.Application.Queries.GetOrders;
+using eCommerce.OrdersService.Application.Queries.GetOrdersByOrderDate;
 using eCommerce.OrdersService.Application.Queries.GetOrdersByProductId;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,13 @@ namespace eCommerce.OrdersService.API.Controllers
         public async Task<IActionResult> GetOrdersByProductId([FromRoute] Guid productId)
         {
             var result = await _mediator.Send(new GetOrdersByProductIdQuery(productId));
+            return result.ToOkApiResult<List<OrderDto>, List<OrderResponse>>(this, _mapper);
+        }
+
+        [HttpGet("search/orderdate/{orderDate:datetime}")]
+        public async Task<IActionResult> GetOrdersByOrderDate([FromRoute] DateTime orderDate)
+        {
+            var result = await _mediator.Send(new GetOrdersByOrderDateQuery(orderDate));
             return result.ToOkApiResult<List<OrderDto>, List<OrderResponse>>(this, _mapper);
         }
 
