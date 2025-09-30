@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <UserSecretsId>6c0ad425-ca26-4fb0-aeaf-793a08c7e730</UserSecretsId>
     <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+    <GenerateDocumentationFile>True</GenerateDocumentationFile>
+    <DocumentationFile>api.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
@@ -20,5 +22,8 @@
     <ProjectReference Include="..\eCommerce.OrdersService.Application\eCommerce.OrdersService.Application.csproj" />
     <ProjectReference Include="..\eCommerce.OrdersService.Infrastructure\eCommerce.OrdersService.Infrastructure.csproj" />
   </ItemGroup>
-
+	
+  <PropertyGroup>
+	<NoWarn>$(NoWarn);1591</NoWarn>
+  </PropertyGroup>
 </Project>

@@ -1,0 +1,358 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>eCommerce.OrdersService.API</name>
+    </assembly>
+    <members>
+        <member name="T:eCommerce.OrdersService.API.Controllers.OrdersController">
+            <summary>
+            Provides API endpoints for managing customer orders.
+            </summary>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.#ctor(MediatR.IMediator,AutoMapper.IMapper)">
+            <summary>
+            Initializes a new instance of the <see cref="T:eCommerce.OrdersService.API.Controllers.OrdersController"/> class.
+            </summary>
+            <param name="mediator">The mediator instance for dispatching requests.</param>
+            <param name="mapper">The mapper instance for transforming objects between layers.</param>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.GetOrders">
+            <summary>
+            Retrieves all orders.
+            </summary>
+            <returns>A list of all orders.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.GetOrderById(System.Guid)">
+            <summary>
+            Retrieves a specific order by its identifier.
+            </summary>
+            <param name="id">The unique identifier of the order.</param>
+            <returns>The requested order if found; otherwise, a 404 response.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.GetOrdersByProductId(System.Guid)">
+            <summary>
+            Retrieves all orders that contain a specific product.
+            </summary>
+            <param name="productId">The unique identifier of the product.</param>
+            <returns>A list of orders that include the specified product; if not found, an empty list.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.GetOrdersByOrderDate(System.DateTime)">
+            <summary>
+            Retrieves all orders created on a specific date.
+            </summary>
+            <param name="orderDate">The date of the orders to search for.</param>
+            <returns>A list of orders placed on the specified date; if not found, an empty list.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.PostOrder(eCommerce.OrdersService.API.DTOs.AddOrderRequest)">
+            <summary>
+            Creates a new order.
+            </summary>
+            <param name="request">The order data to create.</param>
+            <returns>
+            The created order with a 201 response and a location header if successful;
+            otherwise, an error response.
+            </returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.PutOrder(System.Guid,eCommerce.OrdersService.API.DTOs.UpdateOrderRequest)">
+            <summary>
+            Updates an existing order.
+            </summary>
+            <param name="id">The identifier of the order to update.</param>
+            <param name="request">The updated order data.</param>
+            <returns>The updated order if successful; otherwise, an error response.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.DeleteOrder(System.Guid)">
+            <summary>
+            Deletes an order by its identifier.
+            </summary>
+            <param name="id">The identifier of the order to delete.</param>
+            <returns>
+            A 204 No Content response if the deletion is successful; 
+            otherwise, an error response.
+            </returns>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.DTOs.AddOrderItemRequest">
+            <summary>
+            Data transfer object for binding the request to add a new order item.
+            </summary>
+            <param name="ProductId">The unique identifier of the product.</param>
+            <param name="UnitPrice">The unit price.</param>
+            <param name="Quantity">The product quantity.</param>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.DTOs.AddOrderItemRequest.#ctor(System.Guid,System.Decimal,System.Int32)">
+            <summary>
+            Data transfer object for binding the request to add a new order item.
+            </summary>
+            <param name="ProductId">The unique identifier of the product.</param>
+            <param name="UnitPrice">The unit price.</param>
+            <param name="Quantity">The product quantity.</param>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.AddOrderItemRequest.ProductId">
+            <summary>The unique identifier of the product.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.AddOrderItemRequest.UnitPrice">
+            <summary>The unit price.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.AddOrderItemRequest.Quantity">
+            <summary>The product quantity.</summary>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.DTOs.AddOrderRequest">
+            <summary>
+            Data transfer object for binding the request to add a new order.
+            </summary>
+            <param name="UserId">The unique identifier of the user.</param>
+            <param name="OrderDate">The date of the order.</param>
+            <param name="OrderItems">The collection of items in the order.</param>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.DTOs.AddOrderRequest.#ctor(System.Guid,System.DateTime,System.Collections.Generic.List{eCommerce.OrdersService.API.DTOs.AddOrderItemRequest})">
+            <summary>
+            Data transfer object for binding the request to add a new order.
+            </summary>
+            <param name="UserId">The unique identifier of the user.</param>
+            <param name="OrderDate">The date of the order.</param>
+            <param name="OrderItems">The collection of items in the order.</param>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.AddOrderRequest.UserId">
+            <summary>The unique identifier of the user.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.AddOrderRequest.OrderDate">
+            <summary>The date of the order.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.AddOrderRequest.OrderItems">
+            <summary>The collection of items in the order.</summary>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.DTOs.OrderItemResponse">
+            <summary>
+            Data transfer object that represents the response order item information.
+            </summary>
+            <param name="ProductId">The unique identifier of the product.</param>
+            <param name="UnitPrice">The unit price.</param>
+            <param name="Quantity">The product quantity.</param>
+            <param name="TotalPrice">The total price for all products.</param>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.DTOs.OrderItemResponse.#ctor(System.Guid,System.Decimal,System.Int32,System.Decimal)">
+            <summary>
+            Data transfer object that represents the response order item information.
+            </summary>
+            <param name="ProductId">The unique identifier of the product.</param>
+            <param name="UnitPrice">The unit price.</param>
+            <param name="Quantity">The product quantity.</param>
+            <param name="TotalPrice">The total price for all products.</param>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.ProductId">
+            <summary>The unique identifier of the product.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.UnitPrice">
+            <summary>The unit price.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.Quantity">
+            <summary>The product quantity.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.TotalPrice">
+            <summary>The total price for all products.</summary>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.DTOs.OrderResponse">
+            <summary>
+            Data transfer object that represents the response order information.
+            </summary>
+            <param name="OrderId">The unique identifier of the order.</param>
+            <param name="UserId">The unique identifier of the user.</param>
+            <param name="OrderDate">The date of the order.</param>
+            <param name="TotalBill">The total bill of the order.</param>
+            <param name="OrderItems">The collection of items in the order.</param>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.DTOs.OrderResponse.#ctor(System.Guid,System.Guid,System.DateTime,System.Decimal,System.Collections.Generic.List{eCommerce.OrdersService.API.DTOs.OrderItemResponse})">
+            <summary>
+            Data transfer object that represents the response order information.
+            </summary>
+            <param name="OrderId">The unique identifier of the order.</param>
+            <param name="UserId">The unique identifier of the user.</param>
+            <param name="OrderDate">The date of the order.</param>
+            <param name="TotalBill">The total bill of the order.</param>
+            <param name="OrderItems">The collection of items in the order.</param>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderResponse.OrderId">
+            <summary>The unique identifier of the order.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderResponse.UserId">
+            <summary>The unique identifier of the user.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderResponse.OrderDate">
+            <summary>The date of the order.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderResponse.TotalBill">
+            <summary>The total bill of the order.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderResponse.OrderItems">
+            <summary>The collection of items in the order.</summary>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.DTOs.UpdateOrderItemRequest">
+            <summary>
+            Data transfer object for binding the request to update an existing order item.
+            </summary>
+            <param name="ProductId">The unique identifier of the product.</param>
+            <param name="UnitPrice">The unit price.</param>
+            <param name="Quantity">The product quantity.</param>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.DTOs.UpdateOrderItemRequest.#ctor(System.Guid,System.Decimal,System.Int32)">
+            <summary>
+            Data transfer object for binding the request to update an existing order item.
+            </summary>
+            <param name="ProductId">The unique identifier of the product.</param>
+            <param name="UnitPrice">The unit price.</param>
+            <param name="Quantity">The product quantity.</param>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderItemRequest.ProductId">
+            <summary>The unique identifier of the product.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderItemRequest.UnitPrice">
+            <summary>The unit price.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderItemRequest.Quantity">
+            <summary>The product quantity.</summary>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.DTOs.UpdateOrderRequest">
+            <summary>
+            Data transfer object for binding the request to update an existing order.
+            </summary>
+            <param name="OrderId">The unique identifier of the order to update.</param>
+            <param name="UserId">The unique identifier of the user.</param>
+            <param name="OrderDate">The date of the order.</param>
+            <param name="OrderItems">The collection of items in the order.</param>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.DTOs.UpdateOrderRequest.#ctor(System.Guid,System.Guid,System.DateTime,System.Collections.Generic.List{eCommerce.OrdersService.API.DTOs.UpdateOrderItemRequest})">
+            <summary>
+            Data transfer object for binding the request to update an existing order.
+            </summary>
+            <param name="OrderId">The unique identifier of the order to update.</param>
+            <param name="UserId">The unique identifier of the user.</param>
+            <param name="OrderDate">The date of the order.</param>
+            <param name="OrderItems">The collection of items in the order.</param>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderRequest.OrderId">
+            <summary>The unique identifier of the order to update.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderRequest.UserId">
+            <summary>The unique identifier of the user.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderRequest.OrderDate">
+            <summary>The date of the order.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderRequest.OrderItems">
+            <summary>The collection of items in the order.</summary>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.Extensions.AutomapperIServiceCollectionExtensions">
+            <summary>
+            Provides extension methods for registering AutoMapper in <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
+            </summary>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.AutomapperIServiceCollectionExtensions.AddConfiguredAutomapper(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Registers AutoMapper and all mapping profiles from the API project.
+            </summary>
+            <param name="services">The service collection to add AutoMapper to.</param>
+            <returns>The updated <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for chaining.</returns>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.Extensions.CorsIServiceCollectionExtensions">
+            <summary>
+            Provides extension methods for configuring Cross-Origin Resource Sharing (CORS).
+            </summary>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.CorsIServiceCollectionExtensions.AddConfiguredCors(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Adds and configures the default CORS policy using the <c>AllowedOrigins</c> configuration section.
+            </summary>
+            <param name="services">The service collection to add CORS configuration to.</param>
+            <param name="config">The application configuration containing the allowed origins.</param>
+            <returns>The updated <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for chaining.</returns>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.Extensions.FluentResultExtensions">
+            <summary>
+            Provides extension methods for converting <see cref="T:FluentResults.Result"/> and <see cref="T:FluentResults.Result`1"/> 
+            from FluentResults into standardized <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/> responses.
+            </summary>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.FluentResultExtensions.ToOkApiResult``2(FluentResults.Result{``0},Microsoft.AspNetCore.Mvc.ControllerBase,AutoMapper.IMapper)">
+            <summary>
+            Converts a successful <see cref="T:FluentResults.Result`1"/> into an <c>OK</c> response with mapped data.
+            </summary>
+            <typeparam name="TSource">The source type contained in the result.</typeparam>
+            <typeparam name="TDest">The destination type to map to.</typeparam>
+            <param name="result">The operation result.</param>
+            <param name="controller">The controller instance.</param>
+            <param name="mapper">The AutoMapper instance used for mapping.</param>
+            <returns>An <see cref="T:Microsoft.AspNetCore.Mvc.OkObjectResult"/> if successful, or an error response otherwise.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.FluentResultExtensions.ToCreatedApiResult``2(FluentResults.Result{``0},Microsoft.AspNetCore.Mvc.ControllerBase,AutoMapper.IMapper,System.String)">
+            <summary>
+            Converts a successful <see cref="T:FluentResults.Result`1"/> into a <c>CreatedAtAction</c> response with mapped data.
+            </summary>
+            <typeparam name="TSource">The source type contained in the result.</typeparam>
+            <typeparam name="TDest">The destination type to map to. Must implement <see cref="T:eCommerce.OrdersService.API.Interfaces.IResourceWithId"/>.</typeparam>
+            <param name="result">The operation result.</param>
+            <param name="controller">The controller instance.</param>
+            <param name="mapper">The AutoMapper instance used for mapping.</param>
+            <param name="actionName">The action name for the <c>CreatedAtAction</c> response.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Mvc.CreatedAtActionResult"/> if successful, or an error response otherwise.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.FluentResultExtensions.ToNoContentApiResult(FluentResults.Result,Microsoft.AspNetCore.Mvc.ControllerBase)">
+            <summary>
+            Converts a successful <see cref="T:FluentResults.Result"/> into a <c>NoContent</c> response.
+            </summary>
+            <param name="result">The operation result.</param>
+            <param name="controller">The controller instance.</param>
+            <returns>A <see cref="T:Microsoft.AspNetCore.Mvc.NoContentResult"/> if successful, or an error response otherwise.</returns>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.FluentResultExtensions.ToApiResult(FluentResults.Result,System.Func{Microsoft.AspNetCore.Mvc.IActionResult},Microsoft.AspNetCore.Mvc.ControllerBase)">
+            <summary>
+            Converts a <see cref="T:FluentResults.Result"/> into an <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/> 
+            by applying a provided factory for the success case, or generating an error response otherwise.
+            </summary>
+            <param name="result">The operation result to convert.</param>
+            <param name="successFactory">
+            A factory function that produces the <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/> to return when the result is successful.
+            </param>
+            <param name="controller">The controller instance used to generate error responses.</param>
+            <returns>
+            An <see cref="T:Microsoft.AspNetCore.Mvc.IActionResult"/> representing either the successful response produced by 
+            <paramref name="successFactory"/> or a standardized error response.
+            </returns>
+            <remarks>
+            This method serves as the common conversion point for <c>Ok</c>, <c>Created</c>, and <c>NoContent</c> 
+            convenience methods, but can also be used directly for custom behaviors.
+            </remarks>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.Extensions.SwaggerIServiceColletionExtensions">
+            <summary>
+            Provides extension methods for configuring Swagger/OpenAPI.
+            </summary>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.SwaggerIServiceColletionExtensions.AddConfiguredSwagger(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds and configures Swagger generation for the API.
+            </summary>
+            <param name="services">The service collection to add Swagger services to.</param>
+            <returns>The updated <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for chaining.</returns>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.Interfaces.IResourceWithId">
+            <summary>
+            Represents a resource with a unique identifier.
+            </summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.Interfaces.IResourceWithId.ResourceId">
+            <summary>
+            Gets the unique identifier of the resource.
+            </summary>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.Middlewares.ExceptionHandlingMiddleware">
+            <summary>
+            The exception handling middleware that handles all unhandled expections.
+            </summary>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Middlewares.ExceptionHandlingMiddleware.Invoke(Microsoft.AspNetCore.Http.HttpContext)">
+            <summary>
+            Logs all unhandled exceptions and creates response with exception message as detail of the <see cref="T:Microsoft.AspNetCore.Mvc.ProblemDetails"/> and status code HTTP 500.
+            </summary>
+        </member>
+    </members>
+</doc>

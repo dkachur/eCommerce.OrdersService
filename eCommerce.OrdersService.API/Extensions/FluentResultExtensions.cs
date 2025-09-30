@@ -6,8 +6,21 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace eCommerce.OrdersService.API.Extensions;
 
+/// <summary>
+/// Provides extension methods for converting <see cref="Result"/> and <see cref="Result{T}"/> 
+/// from FluentResults into standardized <see cref="IActionResult"/> responses.
+/// </summary>
 public static class FluentResultExtensions
 {
+    /// <summary>
+    /// Converts a successful <see cref="Result{T}"/> into an <c>OK</c> response with mapped data.
+    /// </summary>
+    /// <typeparam name="TSource">The source type contained in the result.</typeparam>
+    /// <typeparam name="TDest">The destination type to map to.</typeparam>
+    /// <param name="result">The operation result.</param>
+    /// <param name="controller">The controller instance.</param>
+    /// <param name="mapper">The AutoMapper instance used for mapping.</param>
+    /// <returns>An <see cref="OkObjectResult"/> if successful, or an error response otherwise.</returns>
     public static IActionResult ToOkApiResult<TSource, TDest>(
         this Result<TSource> result,
         ControllerBase controller,
@@ -20,6 +33,16 @@ public static class FluentResultExtensions
         }, controller); 
     }
 
+    /// <summary>
+    /// Converts a successful <see cref="Result{T}"/> into a <c>CreatedAtAction</c> response with mapped data.
+    /// </summary>
+    /// <typeparam name="TSource">The source type contained in the result.</typeparam>
+    /// <typeparam name="TDest">The destination type to map to. Must implement <see cref="IResourceWithId"/>.</typeparam>
+    /// <param name="result">The operation result.</param>
+    /// <param name="controller">The controller instance.</param>
+    /// <param name="mapper">The AutoMapper instance used for mapping.</param>
+    /// <param name="actionName">The action name for the <c>CreatedAtAction</c> response.</param>
+    /// <returns>A <see cref="CreatedAtActionResult"/> if successful, or an error response otherwise.</returns>
     public static IActionResult ToCreatedApiResult<TSource, TDest>(
         this Result<TSource> result, 
         ControllerBase controller,
@@ -35,6 +58,12 @@ public static class FluentResultExtensions
         }, controller);
     }
 
+    /// <summary>
+    /// Converts a successful <see cref="Result"/> into a <c>NoContent</c> response.
+    /// </summary>
+    /// <param name="result">The operation result.</param>
+    /// <param name="controller">The controller instance.</param>
+    /// <returns>A <see cref="NoContentResult"/> if successful, or an error response otherwise.</returns>
     public static IActionResult ToNoContentApiResult(
         this Result result,
         ControllerBase controller)
@@ -42,6 +71,23 @@ public static class FluentResultExtensions
         return result.ToApiResult(() => controller.NoContent(), controller);
     }
 
+    /// <summary>
+    /// Converts a <see cref="Result"/> into an <see cref="IActionResult"/> 
+    /// by applying a provided factory for the success case, or generating an error response otherwise.
+    /// </summary>
+    /// <param name="result">The operation result to convert.</param>
+    /// <param name="successFactory">
+    /// A factory function that produces the <see cref="IActionResult"/> to return when the result is successful.
+    /// </param>
+    /// <param name="controller">The controller instance used to generate error responses.</param>
+    /// <returns>
+    /// An <see cref="IActionResult"/> representing either the successful response produced by 
+    /// <paramref name="successFactory"/> or a standardized error response.
+    /// </returns>
+    /// <remarks>
+    /// This method serves as the common conversion point for <c>Ok</c>, <c>Created</c>, and <c>NoContent</c> 
+    /// convenience methods, but can also be used directly for custom behaviors.
+    /// </remarks>
     public static IActionResult ToApiResult(this Result result, Func<IActionResult> successFactory, ControllerBase controller)
     {
         if (result.IsFailed)
