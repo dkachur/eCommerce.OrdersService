@@ -3,6 +3,7 @@ using eCommerce.OrdersService.Application.DTOs;
 using eCommerce.OrdersService.Application.Errors;
 using eCommerce.OrdersService.Application.Extensions;
 using eCommerce.OrdersService.Application.RepositoryContracts;
+using eCommerce.OrdersService.Application.ServiceContracts;
 using eCommerce.OrdersService.Domain.Entities;
 using FluentResults;
 using FluentValidation;
@@ -15,29 +16,33 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Res
     private readonly IValidator<UpdateOrderDto> _validator;
     private readonly IMapper _mapper;
     private readonly IOrdersRepository _repo;
+    private readonly IUsersServiceClient _usersServiceClient;
 
-    public UpdateOrderCommandHandler(IValidator<UpdateOrderDto> validator, IMapper mapper, IOrdersRepository repo)
+    public UpdateOrderCommandHandler(IValidator<UpdateOrderDto> validator, IMapper mapper, IOrdersRepository repo, IUsersServiceClient usersServiceClient)
     {
         _validator = validator;
         _mapper = mapper;
         _repo = repo;
+        _usersServiceClient = usersServiceClient;
     }
 
-    public async Task<Result<OrderDto>> Handle(UpdateOrderCommand request, CancellationToken cancellationToken)
+    public async Task<Result<OrderDto>> Handle(UpdateOrderCommand request, CancellationToken ct)
     {
         var updateOrder = request.UpdateOrder;
-        var validRes = await _validator.ValidateAsync(updateOrder);
+        var validRes = await _validator.ValidateAsync(updateOrder, ct);
         if (!validRes.IsValid)
             return Result.Fail<OrderDto>(validRes.ToValidationErrors());
 
+        var userRes = await _usersServiceClient.GetUserAsync(updateOrder.UserId, ct);
+        if (userRes is null)
+            return Result.Fail<OrderDto>(InvalidUserIdError.WithId(updateOrder.UserId));
+
         var order = _mapper.Map<Order>(updateOrder);
-        var updatedOrder = await _repo.UpdateOrderAsync(order);
+        var updatedOrder = await _repo.UpdateOrderAsync(order, ct);
 
         if (updatedOrder is null)
             return Result.Fail<OrderDto>(OrderNotFoundError.WithId(updateOrder.OrderId));
 
         return Result.Ok(_mapper.Map<OrderDto>(updatedOrder));
     }
-
-
 }

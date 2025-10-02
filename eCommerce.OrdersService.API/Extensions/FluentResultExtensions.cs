@@ -108,14 +108,19 @@ public static class FluentResultExtensions
 
         return firstError switch
         {
+            PersistenceError => controller.Problem(
+                statusCode: StatusCodes.Status500InternalServerError,
+                title: "An unexpected error occurred.",
+                detail: firstError.Message),
+
             OrderNotFoundError => controller.Problem(
                 statusCode: StatusCodes.Status404NotFound,
                 title: "Order not found.",
                 detail: firstError.Message),
 
-            PersistenceError => controller.Problem(
-                statusCode: StatusCodes.Status500InternalServerError,
-                title: "An unexpected error occurred.",
+            InvalidUserIdError => controller.Problem(
+                statusCode: StatusCodes.Status400BadRequest,
+                title: "Invalid user id.",
                 detail: firstError.Message),
 
             ValidationError => controller.ValidationProblem(

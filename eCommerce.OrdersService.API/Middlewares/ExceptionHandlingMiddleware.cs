@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using System.Net;
 
 namespace eCommerce.OrdersService.API.Middlewares
 {
@@ -32,12 +33,17 @@ namespace eCommerce.OrdersService.API.Middlewares
                 if (ex.InnerException is not null)
                     _logger.LogError(ex.InnerException, "Unhandled exception occurred");
 
-                httpContext.Response.StatusCode = StatusCodes.Status500InternalServerError;
+                httpContext.Response.StatusCode = ex switch
+                {
+                    HttpRequestException e => (int)(e.StatusCode ?? HttpStatusCode.InternalServerError),
+                    _ => StatusCodes.Status500InternalServerError
+                };
+
                 await httpContext.Response.WriteAsJsonAsync(new ProblemDetails()
                 {
                     Title = "An unexcepcted error occurred.",
                     Detail = ex.Message,
-                    Status = StatusCodes.Status500InternalServerError,
+                    Status = httpContext.Response.StatusCode,
                     Instance = httpContext.Request.Path
                 });
             }

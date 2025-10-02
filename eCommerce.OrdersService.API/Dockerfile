@@ -27,8 +27,12 @@ RUN dotnet publish "./eCommerce.OrdersService.API.csproj" -c $BUILD_CONFIGURATIO
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENV Mongo__User=appuser
-ENV Mongo__Pass=password
-ENV Mongo__Host=localhost
-ENV Mongo__Port=27017
+ENV MONGO_USER=appuser
+ENV MONGO_PASS=password
+ENV MONGO_HOST=localhost
+ENV MONGO_PORT=27017
+ENV MONGO_DATABASE=orders
+ENV MONGO_COLLECTION_ORDERS=orders
+ENV USERSERVICE_HOST=localhost
+ENV USERSERVICE_PORT=9090
 ENTRYPOINT ["dotnet", "eCommerce.OrdersService.API.dll"]

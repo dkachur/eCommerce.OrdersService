@@ -5,8 +5,12 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "Mongo__Host": "localhost",
-        "Mongo__Port": "27017"
+        "MONGO_HOST": "localhost",
+        "MONGO_PORT": "27017",
+        "MONGO_DATABASE": "orders",
+        "MONGO_COLLECTION_ORDERS": "orders",
+        "USERSERVICE_HOST": "localhost",
+        "USERSERVICE_PORT": "9090"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:7979"
@@ -16,8 +20,12 @@
       "launchBrowser": false,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "Mongo__Host": "localhost",
-        "Mongo__Port": "27017"
+        "MONGO_HOST": "localhost",
+        "MONGO_PORT": "27017",
+        "MONGO_DATABASE": "orders",
+        "MONGO_COLLECTION_ORDERS": "orders",
+        "USERSERVICE_HOST": "localhost",
+        "USERSERVICE_PORT": "9090"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7148;http://localhost:7979"

@@ -1,9 +1,12 @@
 ﻿using eCommerce.OrdersService.Application.RepositoryContracts;
+using eCommerce.OrdersService.Application.ServiceContracts;
+using eCommerce.OrdersService.Infrastructure.Clients;
 using eCommerce.OrdersService.Infrastructure.MappingProfiles;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Config;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Repositories;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 
@@ -15,21 +18,48 @@ public static class DependencyInjection
     {
         services.AddAutoMapper(cfg => { }, typeof(OrderItemMappingProfile));
 
-        services.Configure<CollectionOptions>(config.GetSection("Mongo:Collections"));
-        services.Configure<MongoOptions>(config.GetSection("Mongo"));
+        services.AddMongo(config);
+        services.AddUsersServiceClient(config);
 
-        var user = config["Mongo:User"];
-        var pass = config["Mongo:Pass"];
-        var host = config["Mongo:Host"];
-        var port = config["Mongo:Port"];
+        services.AddScoped<IOrdersRepository, OrdersRepository>();
+
+        return services;
+    }
+
+    private static IServiceCollection AddMongo(this IServiceCollection services, IConfiguration config)
+    {
+        var mongoOptions = new MongoOptions()
+        {
+            User = config["MONGO_USER"]!,
+            Pass = config["MONGO_PASS"]!,
+            Host = config["MONGO_HOST"]!,
+            Port = config["MONGO_PORT"]!,
+            Database = config["MONGO_DATABASE"]!,
+            Collections = new CollectionOptions()
+            {
+                Orders = config["MONGO_COLLECTION_ORDERS"]!
+            }
+        };
+
+        services.Configure<MongoOptions>(opt =>
+        {
+            opt.User = mongoOptions.User;
+            opt.Pass = mongoOptions.Pass;
+            opt.Host = mongoOptions.Host;
+            opt.Port = mongoOptions.Port;
+            opt.Database = mongoOptions.Database;
+            opt.Collections = mongoOptions.Collections;
+        });
+
+        var user = mongoOptions.User;
+        var pass = mongoOptions.Pass;
+        var host = mongoOptions.Host;
+        var port = mongoOptions.Port;
         var connectionString = $"mongodb://{user}:{pass}@{host}:{port}";
 
         var mongoClient = new MongoClient(connectionString);
         services.AddSingleton<IMongoClient>(mongoClient);
-        services.AddScoped<IMongoDatabase>(sp =>
-        {
-            return mongoClient.GetDatabase(config["Mongo:Database"]);
-        });
+        services.AddScoped<IMongoDatabase>(_ => mongoClient.GetDatabase(mongoOptions.Database));
 
         var conventionPack = new ConventionPack
         {
@@ -41,8 +71,22 @@ public static class DependencyInjection
             conventionPack,
             t => true);
 
+        return services;
+    }
 
-        services.AddScoped<IOrdersRepository, OrdersRepository>();
+    private static IServiceCollection AddUsersServiceClient(this IServiceCollection services, IConfiguration config)
+    {
+        services.Configure<UsersServiceOptions>(opt =>
+        {
+            opt.Host = config["USERSERVICE_HOST"]!;
+            opt.Port = config["USERSERVICE_PORT"]!;
+        });
+
+        services.AddHttpClient<IUsersServiceClient, UsersServiceClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<IOptions<UsersServiceOptions>>().Value;
+            client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
+        });
 
         return services;
     }
