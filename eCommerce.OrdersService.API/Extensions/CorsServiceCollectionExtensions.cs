@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides extension methods for configuring Cross-Origin Resource Sharing (CORS).
 /// </summary>
-public static class CorsIServiceCollectionExtensions
+public static class CorsServiceCollectionExtensions
 {
     /// <summary>
     /// Adds and configures the default CORS policy using the <c>AllowedOrigins</c> configuration section.

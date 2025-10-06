@@ -8,6 +8,8 @@ public class OrderItemResponseMappingProfile : Profile
 {
     public OrderItemResponseMappingProfile()
     {
-        CreateMap<OrderItemDto, OrderItemResponse>();
+        CreateMap<OrderItemDto, OrderItemResponse>()
+            .ForMember(dest => dest.Category, opt => opt.Ignore())
+            .ForMember(dest => dest.Name, opt => opt.Ignore());
     }
 }

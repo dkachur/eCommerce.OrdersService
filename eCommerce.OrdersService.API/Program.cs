@@ -1,4 +1,5 @@
 using eCommerce.OrdersService.API.Extensions;
+using eCommerce.OrdersService.API.Filters;
 using eCommerce.OrdersService.API.Middlewares;
 using eCommerce.OrdersService.Application;
 using eCommerce.OrdersService.Infrastructure;
@@ -10,7 +11,12 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddApplication()
                 .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddEnrichers();
+
+builder.Services.AddControllers(opt =>
+{
+    opt.Filters.Add<OrderResponseEnrichmentFilter>();
+});
 
 builder.Services.AddConfiguredAutomapper()
                 .AddConfiguredSwagger()

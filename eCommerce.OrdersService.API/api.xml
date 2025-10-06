@@ -129,8 +129,10 @@
             <param name="UnitPrice">The unit price.</param>
             <param name="Quantity">The product quantity.</param>
             <param name="TotalPrice">The total price for all products.</param>
+            <param name="Category">The category of the product.</param>
+            <param name="Name">The name of the product.</param>
         </member>
-        <member name="M:eCommerce.OrdersService.API.DTOs.OrderItemResponse.#ctor(System.Guid,System.Decimal,System.Int32,System.Decimal)">
+        <member name="M:eCommerce.OrdersService.API.DTOs.OrderItemResponse.#ctor(System.Guid,System.Decimal,System.Int32,System.Decimal,System.String,System.String)">
             <summary>
             Data transfer object that represents the response order item information.
             </summary>
@@ -138,6 +140,8 @@
             <param name="UnitPrice">The unit price.</param>
             <param name="Quantity">The product quantity.</param>
             <param name="TotalPrice">The total price for all products.</param>
+            <param name="Category">The category of the product.</param>
+            <param name="Name">The name of the product.</param>
         </member>
         <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.ProductId">
             <summary>The unique identifier of the product.</summary>
@@ -150,6 +154,12 @@
         </member>
         <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.TotalPrice">
             <summary>The total price for all products.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.Category">
+            <summary>The category of the product.</summary>
+        </member>
+        <member name="P:eCommerce.OrdersService.API.DTOs.OrderItemResponse.Name">
+            <summary>The name of the product.</summary>
         </member>
         <member name="T:eCommerce.OrdersService.API.DTOs.OrderResponse">
             <summary>
@@ -241,29 +251,41 @@
         <member name="P:eCommerce.OrdersService.API.DTOs.UpdateOrderRequest.OrderItems">
             <summary>The collection of items in the order.</summary>
         </member>
-        <member name="T:eCommerce.OrdersService.API.Extensions.AutomapperIServiceCollectionExtensions">
+        <member name="T:eCommerce.OrdersService.API.Extensions.AutomapperServiceCollectionExtensions">
             <summary>
             Provides extension methods for registering AutoMapper in <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/>.
             </summary>
         </member>
-        <member name="M:eCommerce.OrdersService.API.Extensions.AutomapperIServiceCollectionExtensions.AddConfiguredAutomapper(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:eCommerce.OrdersService.API.Extensions.AutomapperServiceCollectionExtensions.AddConfiguredAutomapper(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Registers AutoMapper and all mapping profiles from the API project.
             </summary>
             <param name="services">The service collection to add AutoMapper to.</param>
             <returns>The updated <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for chaining.</returns>
         </member>
-        <member name="T:eCommerce.OrdersService.API.Extensions.CorsIServiceCollectionExtensions">
+        <member name="T:eCommerce.OrdersService.API.Extensions.CorsServiceCollectionExtensions">
             <summary>
             Provides extension methods for configuring Cross-Origin Resource Sharing (CORS).
             </summary>
         </member>
-        <member name="M:eCommerce.OrdersService.API.Extensions.CorsIServiceCollectionExtensions.AddConfiguredCors(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
+        <member name="M:eCommerce.OrdersService.API.Extensions.CorsServiceCollectionExtensions.AddConfiguredCors(Microsoft.Extensions.DependencyInjection.IServiceCollection,Microsoft.Extensions.Configuration.IConfiguration)">
             <summary>
             Adds and configures the default CORS policy using the <c>AllowedOrigins</c> configuration section.
             </summary>
             <param name="services">The service collection to add CORS configuration to.</param>
             <param name="config">The application configuration containing the allowed origins.</param>
+            <returns>The updated <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for chaining.</returns>
+        </member>
+        <member name="T:eCommerce.OrdersService.API.Extensions.EnricherServiceCollectionExtensions">
+            <summary>
+            Provides extension methods for adding response enrichers to DI.
+            </summary>
+        </member>
+        <member name="M:eCommerce.OrdersService.API.Extensions.EnricherServiceCollectionExtensions.AddEnrichers(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            Adds <see cref="T:eCommerce.OrdersService.API.Enrichers.OrderResponseEnricher"/> as scoped service to DI.
+            </summary>
+            <param name="services">The service collection to add response enricher to.</param>
             <returns>The updated <see cref="T:Microsoft.Extensions.DependencyInjection.IServiceCollection"/> for chaining.</returns>
         </member>
         <member name="T:eCommerce.OrdersService.API.Extensions.FluentResultExtensions">
@@ -322,12 +344,12 @@
             convenience methods, but can also be used directly for custom behaviors.
             </remarks>
         </member>
-        <member name="T:eCommerce.OrdersService.API.Extensions.SwaggerIServiceColletionExtensions">
+        <member name="T:eCommerce.OrdersService.API.Extensions.SwaggerServiceColletionExtensions">
             <summary>
             Provides extension methods for configuring Swagger/OpenAPI.
             </summary>
         </member>
-        <member name="M:eCommerce.OrdersService.API.Extensions.SwaggerIServiceColletionExtensions.AddConfiguredSwagger(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:eCommerce.OrdersService.API.Extensions.SwaggerServiceColletionExtensions.AddConfiguredSwagger(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             Adds and configures Swagger generation for the API.
             </summary>

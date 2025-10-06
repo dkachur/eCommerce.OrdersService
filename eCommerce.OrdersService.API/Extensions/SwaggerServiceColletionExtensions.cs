@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides extension methods for configuring Swagger/OpenAPI.
 /// </summary>
-public static class SwaggerIServiceColletionExtensions
+public static class SwaggerServiceColletionExtensions
 {
     /// <summary>
     /// Adds and configures Swagger generation for the API.

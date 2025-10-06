@@ -3,7 +3,7 @@
 /// <summary>
 /// Provides extension methods for registering AutoMapper in <see cref="IServiceCollection"/>.
 /// </summary>
-public static class AutomapperIServiceCollectionExtensions
+public static class AutomapperServiceCollectionExtensions
 {
     /// <summary>
     /// Registers AutoMapper and all mapping profiles from the API project.

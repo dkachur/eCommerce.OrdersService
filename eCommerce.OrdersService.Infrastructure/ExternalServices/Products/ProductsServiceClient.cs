@@ -1,4 +1,5 @@
-﻿using eCommerce.OrdersService.Application.ServiceContracts;
+﻿using eCommerce.OrdersService.Application.DTOs;
+using eCommerce.OrdersService.Application.ServiceContracts;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Products.DTOs;
 using Microsoft.Extensions.Logging;
 using System.Net;
@@ -57,5 +58,42 @@ public class ProductsServiceClient : IProductsServiceClient
             .ToDictionary(p => p.ProductId, p => p.Exists);
 
         return dictionary;
+    }
+
+    public async Task<List<ProductDto>> GetProductsInfoAsync(IEnumerable<Guid> productIds, CancellationToken ct = default)
+    {
+        HttpResponseMessage response;
+
+        try
+        {
+            response = await _httpClient.PostAsync("/api/products/by-ids", JsonContent.Create(productIds), ct);
+        }
+        catch (HttpRequestException ex)
+        {
+            _logger.LogError(ex, "Error while sending request to Products microservice.");
+
+            throw new HttpRequestException(
+                "Products Service is unavailable.",
+                inner: null,
+                statusCode: HttpStatusCode.ServiceUnavailable);
+        }
+
+        if (!response.IsSuccessStatusCode)
+            throw new HttpRequestException(
+                message: "Products Service responded with an error.",
+                inner: null,
+                statusCode: HttpStatusCode.InternalServerError);
+
+        var content = await response.Content.ReadFromJsonAsync<IEnumerable<ProductDto>>(ct);
+        if (content is null)
+        {
+            _logger.LogError("Products Service returned an empty or invalid response.");
+            throw new HttpRequestException(
+                "Invalid response from Products Service.",
+                inner: null,
+                statusCode: HttpStatusCode.InternalServerError);
+        }
+
+        return content.ToList();
     }
 }
