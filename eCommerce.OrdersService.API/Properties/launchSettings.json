@@ -10,7 +10,9 @@
         "MONGO_DATABASE": "orders",
         "MONGO_COLLECTION_ORDERS": "orders",
         "USERSERVICE_HOST": "localhost",
-        "USERSERVICE_PORT": "9090"
+        "USERSERVICE_PORT": "9090",
+        "PORDUCTSERVICE_HOST": "localhost",
+        "PRODUCTSERVICE_PORT": "9898"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:7979"
@@ -25,7 +27,9 @@
         "MONGO_DATABASE": "orders",
         "MONGO_COLLECTION_ORDERS": "orders",
         "USERSERVICE_HOST": "localhost",
-        "USERSERVICE_PORT": "9090"
+        "USERSERVICE_PORT": "9090",
+        "PORDUCTSERVICE_HOST": "localhost",
+        "PRODUCTSERVICE_PORT": "9898"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7148;http://localhost:7979"

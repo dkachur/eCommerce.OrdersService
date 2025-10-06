@@ -122,6 +122,10 @@ public static class FluentResultExtensions
                 result.Errors.OfType<InvalidUserIdError>()
                     .ToModelStateDictionary(e => $"UserId[{e.UserId}]")),
 
+            InvalidProductIdError => controller.ValidationProblem(
+                result.Errors.OfType<InvalidProductIdError>()
+                    .ToModelStateDictionary(e => $"ProductId[{e.ProductId}]")),
+
             ValidationError => controller.ValidationProblem(
                 result.Errors.OfType<ValidationError>()
                     .ToModelStateDictionary(e => e.PropertyName)),

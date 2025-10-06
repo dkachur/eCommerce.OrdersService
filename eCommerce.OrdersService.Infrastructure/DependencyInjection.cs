@@ -1,5 +1,7 @@
 ﻿using eCommerce.OrdersService.Application.RepositoryContracts;
 using eCommerce.OrdersService.Application.ServiceContracts;
+using eCommerce.OrdersService.Infrastructure.ExternalServices.Products;
+using eCommerce.OrdersService.Infrastructure.ExternalServices.Products.Config;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Users.Config;
 using eCommerce.OrdersService.Infrastructure.MappingProfiles;
@@ -21,6 +23,7 @@ public static class DependencyInjection
 
         services.AddMongo(config);
         services.AddUsersServiceClient(config);
+        services.AddProductsServiceClient(config);
 
         services.AddScoped<IOrdersRepository, OrdersRepository>();
 
@@ -86,6 +89,23 @@ public static class DependencyInjection
         services.AddHttpClient<IUsersServiceClient, UsersServiceClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<UsersServiceOptions>>().Value;
+            client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
+        });
+
+        return services;
+    }
+
+    private static IServiceCollection AddProductsServiceClient(this IServiceCollection services, IConfiguration config)
+    {
+        services.Configure<ProductsServiceOptions>(opt =>
+        {
+            opt.Host = config["PRODUCTSERVICE_HOST"]!;
+            opt.Port = config["PRODUCTSERVICE_PORT"]!;
+        });
+
+        services.AddHttpClient<IProductsServiceClient, ProductsServiceClient>((sp, client) =>
+        {
+            var options = sp.GetRequiredService<IOptions<ProductsServiceOptions>>().Value;
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
         });
 

@@ -17,13 +17,19 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Res
     private readonly IMapper _mapper;
     private readonly IOrdersRepository _repo;
     private readonly IUsersServiceClient _usersServiceClient;
+    private readonly IProductsServiceClient _productsServiceClient;
 
-    public UpdateOrderCommandHandler(IValidator<UpdateOrderDto> validator, IMapper mapper, IOrdersRepository repo, IUsersServiceClient usersServiceClient)
+    public UpdateOrderCommandHandler(
+        IValidator<UpdateOrderDto> validator, 
+        IMapper mapper, IOrdersRepository repo, 
+        IUsersServiceClient usersServiceClient, 
+        IProductsServiceClient productsServiceClient)
     {
         _validator = validator;
         _mapper = mapper;
         _repo = repo;
         _usersServiceClient = usersServiceClient;
+        _productsServiceClient = productsServiceClient;
     }
 
     public async Task<Result<OrderDto>> Handle(UpdateOrderCommand request, CancellationToken ct)
@@ -36,6 +42,18 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Res
         var userRes = await _usersServiceClient.GetUserAsync(updateOrder.UserId, ct);
         if (userRes is null)
             return Result.Fail<OrderDto>(InvalidUserIdError.WithId(updateOrder.UserId));
+
+        var productsExistRes = await _productsServiceClient
+            .CheckProductsExistAsync(updateOrder.UpdateOrderItemDtos.Select(o => o.ProductId), ct);
+
+        var invalidProductIds = productsExistRes
+            .Where(kvp => kvp.Value is false)
+            .Select(kvp => kvp.Key)
+            .ToList();
+
+        if (invalidProductIds.Any())
+            return Result.Fail<OrderDto>(
+                invalidProductIds.Select(id => InvalidProductIdError.WithId(id)));
 
         var order = _mapper.Map<Order>(updateOrder);
         var updatedOrder = await _repo.UpdateOrderAsync(order, ct);
