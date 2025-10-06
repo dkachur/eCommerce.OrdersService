@@ -1,6 +1,7 @@
 ﻿using eCommerce.OrdersService.Application.RepositoryContracts;
 using eCommerce.OrdersService.Application.ServiceContracts;
-using eCommerce.OrdersService.Infrastructure.Clients;
+using eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
+using eCommerce.OrdersService.Infrastructure.ExternalServices.Users.Config;
 using eCommerce.OrdersService.Infrastructure.MappingProfiles;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Config;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Repositories;

@@ -1,4 +1,4 @@
-﻿namespace eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Config;
+﻿namespace eCommerce.OrdersService.Infrastructure.ExternalServices.Users.Config;
 
 internal class UsersServiceOptions
 {

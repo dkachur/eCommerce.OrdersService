@@ -118,13 +118,13 @@ public static class FluentResultExtensions
                 title: "Order not found.",
                 detail: firstError.Message),
 
-            InvalidUserIdError => controller.Problem(
-                statusCode: StatusCodes.Status400BadRequest,
-                title: "Invalid user id.",
-                detail: firstError.Message),
+            InvalidUserIdError => controller.ValidationProblem(
+                result.Errors.OfType<InvalidUserIdError>()
+                    .ToModelStateDictionary(e => $"UserId[{e.UserId}]")),
 
             ValidationError => controller.ValidationProblem(
-                result.Errors.ToModelStateDictionary()),
+                result.Errors.OfType<ValidationError>()
+                    .ToModelStateDictionary(e => e.PropertyName)),
 
             _ => controller.Problem(
                 statusCode: StatusCodes.Status500InternalServerError,
@@ -138,10 +138,12 @@ public static class FluentResultExtensions
 
     #region Helpers
 
-    private static ValidationProblemDetails ToModelStateDictionary(this IReadOnlyList<IError> errors)
+    private static ValidationProblemDetails ToModelStateDictionary<TError>(
+        this IEnumerable<TError> errors,
+        Func<TError, string> keySelector)
+        where TError : Error
     {
-        return new(errors.OfType<ValidationError>()
-                         .GroupBy(e => e.PropertyName)
+        return new(errors.GroupBy(keySelector)
                          .ToDictionary(group => group.Key,
                                        group => group.Select(e => e.Message)
                                                      .ToArray()));
