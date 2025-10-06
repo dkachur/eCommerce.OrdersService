@@ -22,8 +22,14 @@
     <ProjectReference Include="..\eCommerce.OrdersService.Application\eCommerce.OrdersService.Application.csproj" />
     <ProjectReference Include="..\eCommerce.OrdersService.Infrastructure\eCommerce.OrdersService.Infrastructure.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <Folder Include="Enrichers\" />
+    <Folder Include="Fitlers\" />
+  </ItemGroup>
 	
   <PropertyGroup>
 	<NoWarn>$(NoWarn);1591</NoWarn>
+	<DockerComposeProjectPath>..\docker-compose.dcproj</DockerComposeProjectPath>
   </PropertyGroup>
 </Project>
