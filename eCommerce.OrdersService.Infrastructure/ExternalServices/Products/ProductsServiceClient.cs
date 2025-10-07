@@ -46,10 +46,7 @@ public class ProductsServiceClient : IProductsServiceClient
         if (content is null)
         {
             _logger.LogError("Products Service returned an empty or invalid response.");
-            throw new HttpRequestException(
-                "Invalid response from Products Service.",
-                inner: null,
-                statusCode: HttpStatusCode.InternalServerError);
+            throw new InvalidDataException("Invalid response from Products Service.");
         }
 
         var dictionary = content
