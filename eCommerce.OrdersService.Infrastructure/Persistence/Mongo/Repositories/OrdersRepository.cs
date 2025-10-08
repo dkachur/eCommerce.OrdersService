@@ -71,6 +71,14 @@ public class OrdersRepository : IOrdersRepository
         return _mapper.Map<List<Order>>(docs);
     }
 
+    public async Task<List<Order>> GetByUserIdAsync(Guid userId, CancellationToken ct = default)
+    {
+        var filter = Builders<OrderDocument>.Filter.Eq(d => d.UserId, userId);
+
+        var docs = await _collection.Find(filter).ToListAsync(ct);
+        return _mapper.Map<List<Order>>(docs);
+    }
+
     public async Task<List<Order>> GetByOrderDate(DateTime orderDate, CancellationToken ct = default)
     {
         var start = orderDate.Date;

@@ -37,6 +37,16 @@ public interface IOrdersRepository
     Task<List<Order>> GetByProductIdAsync(Guid productId, CancellationToken ct = default);
 
     /// <summary>
+    /// Retrieves all orders that correspond to the user with the specified <paramref name="userId"/>.
+    /// </summary>
+    /// <param name="userId">The unique identifier of the user.</param>
+    /// <returns>
+    /// A list of <see cref="Order"/> instances that match the search criteria.  
+    /// If no orders are found, an empty collection is returned.
+    /// </returns>
+    Task<List<Order>> GetByUserIdAsync(Guid userId, CancellationToken ct = default);
+
+    /// <summary>
     /// Retrieves all orders that were made at the specified date.
     /// </summary>
     /// <param name="orderDate">The date of the orders.</param>

@@ -9,6 +9,7 @@ using eCommerce.OrdersService.Application.Queries.GetOrderById;
 using eCommerce.OrdersService.Application.Queries.GetOrders;
 using eCommerce.OrdersService.Application.Queries.GetOrdersByOrderDate;
 using eCommerce.OrdersService.Application.Queries.GetOrdersByProductId;
+using eCommerce.OrdersService.Application.Queries.GetOrdersByUserId;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
 
@@ -74,6 +75,20 @@ namespace eCommerce.OrdersService.API.Controllers
         public async Task<IActionResult> GetOrdersByProductId([FromRoute] Guid productId)
         {
             var result = await _mediator.Send(new GetOrdersByProductIdQuery(productId));
+            return result.ToOkApiResult<List<OrderDto>, List<OrderResponse>>(this, _mapper);
+        }
+
+        /// <summary>
+        /// Retrieves all orders that correspond to the specific user.
+        /// </summary>
+        /// <param name="userId">The unique identifier of the user.</param>
+        /// <returns>A list of orders that correspond to the specific user; if not found, an empty list.</returns>
+        [HttpGet("search/userid/{userId:guid}")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetOrdersByUserId([FromRoute] Guid userId)
+        {
+            var result = await _mediator.Send(new GetOrdersByUserIdQuery(userId));
             return result.ToOkApiResult<List<OrderDto>, List<OrderResponse>>(this, _mapper);
         }
 

@@ -48,7 +48,7 @@ services:
       - MYSQL_PORT=3306
       - MYSQL_DB=ecommerceproducts
     ports:
-      - "6000:8080"
+      - "6001:8080"
     depends_on:
       - mysql
     networks:

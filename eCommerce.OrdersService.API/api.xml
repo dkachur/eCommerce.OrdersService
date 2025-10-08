@@ -36,6 +36,13 @@
             <param name="productId">The unique identifier of the product.</param>
             <returns>A list of orders that include the specified product; if not found, an empty list.</returns>
         </member>
+        <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.GetOrdersByUserId(System.Guid)">
+            <summary>
+            Retrieves all orders that correspond to the specific user.
+            </summary>
+            <param name="userId">The unique identifier of the user.</param>
+            <returns>A list of orders that correspond to the specific user; if not found, an empty list.</returns>
+        </member>
         <member name="M:eCommerce.OrdersService.API.Controllers.OrdersController.GetOrdersByOrderDate(System.DateTime)">
             <summary>
             Retrieves all orders created on a specific date.
