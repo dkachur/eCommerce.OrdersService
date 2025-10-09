@@ -7,11 +7,13 @@ using eCommerce.OrdersService.Infrastructure.ExternalServices.Users.Config;
 using eCommerce.OrdersService.Infrastructure.MappingProfiles;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Config;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Repositories;
+using eCommerce.OrdersService.Infrastructure.Policies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using Polly;
 
 namespace eCommerce.OrdersService.Infrastructure;
 
@@ -86,11 +88,20 @@ public static class DependencyInjection
             opt.Port = config["USERSERVICE_PORT"]!;
         });
 
+        services.AddSingleton<IAsyncPolicy<HttpResponseMessage>>(sp =>
+        {
+            var retry = HttpPolicies.GetUsersServiceRetryPolicy(sp);
+            var circuitBreaker = HttpPolicies.GetUsersServiceCircuitBreakerPolicy(sp);
+
+            return Policy.WrapAsync(retry, circuitBreaker);
+        });
+
         services.AddHttpClient<IUsersServiceClient, UsersServiceClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<UsersServiceOptions>>().Value;
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
-        });
+        })
+        .AddPolicyHandler((sp, _) => sp.GetRequiredService<IAsyncPolicy<HttpResponseMessage>>());
 
         return services;
     }

@@ -39,10 +39,16 @@ public class UsersServiceClient : IUsersServiceClient
             return null;
 
         if (!response.IsSuccessStatusCode)
-            throw new HttpRequestException(
-                message: "Users Service responded with an error.",
-                inner: null,
-                statusCode: HttpStatusCode.InternalServerError);
+            return new UserDto(
+                UserId: Guid.Empty,
+                Email: "Temporarily unavailable",
+                PersonName: "Temporarily unavailable",
+                Gender: "Temporarily unavailable");
+
+            //throw new HttpRequestException(
+            //    message: "Users Service responded with an error.",
+            //    inner: null,
+            //    statusCode: HttpStatusCode.InternalServerError);
 
         return await response.Content.ReadFromJsonAsync<UserDto>(ct);
     }
