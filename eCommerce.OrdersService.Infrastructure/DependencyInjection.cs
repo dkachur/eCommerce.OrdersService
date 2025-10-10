@@ -13,7 +13,6 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
-using Polly;
 
 namespace eCommerce.OrdersService.Infrastructure;
 
@@ -88,20 +87,14 @@ public static class DependencyInjection
             opt.Port = config["USERSERVICE_PORT"]!;
         });
 
-        services.AddSingleton<IAsyncPolicy<HttpResponseMessage>>(sp =>
-        {
-            var retry = HttpPolicies.GetUsersServiceRetryPolicy(sp);
-            var circuitBreaker = HttpPolicies.GetUsersServiceCircuitBreakerPolicy(sp);
-
-            return Policy.WrapAsync(retry, circuitBreaker);
-        });
+        services.AddSingleton<UsersMicroservicePolicy>();
 
         services.AddHttpClient<IUsersServiceClient, UsersServiceClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<UsersServiceOptions>>().Value;
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
         })
-        .AddPolicyHandler((sp, _) => sp.GetRequiredService<IAsyncPolicy<HttpResponseMessage>>());
+        .AddPolicyHandler((sp, _) => sp.GetRequiredService<UsersMicroservicePolicy>().Wrap);
 
         return services;
     }

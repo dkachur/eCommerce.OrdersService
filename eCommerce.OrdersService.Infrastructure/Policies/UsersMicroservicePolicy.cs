@@ -1,31 +1,39 @@
 ﻿using eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
-using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Polly;
 
 namespace eCommerce.OrdersService.Infrastructure.Policies;
 
-public static class HttpPolicies
+public class UsersMicroservicePolicy
 {
+    public IAsyncPolicy<HttpResponseMessage> Wrap { get; }
+
     private const int RetryCount = 5;
     private const int CircuitBreakerThreshold = 3;
-    private const int DurationOfBreakInSeconds = 15;
+    private const int DurationOfBreakInSeconds = 40;
     private const double InitialDelaySeconds = 1.5d;
 
-    public static IAsyncPolicy<HttpResponseMessage> GetUsersServiceRetryPolicy(IServiceProvider sp)
+    public UsersMicroservicePolicy(ILogger<UsersServiceClient> logger)
     {
-        var logger = sp.GetRequiredService<ILogger<UsersServiceClient>>();
+        var retry = GetRetryPolicy(logger);
+        var breaker = GetCircuitBreakerPolicy(logger);
+
+        Wrap = Policy.WrapAsync(retry, breaker);
+    }
+
+    public static IAsyncPolicy<HttpResponseMessage> GetRetryPolicy(ILogger<UsersServiceClient> logger)
+    {
         var policy = Policy
-            .HandleResult<HttpResponseMessage>(r => 
+            .HandleResult<HttpResponseMessage>(r =>
                 !r.IsSuccessStatusCode && r.StatusCode != System.Net.HttpStatusCode.NotFound)
             .WaitAndRetryAsync(
                 retryCount: RetryCount,
-                sleepDurationProvider: attempt => 
+                sleepDurationProvider: attempt =>
                     TimeSpan.FromSeconds(Math.Pow(InitialDelaySeconds, attempt)),
                 onRetry: (outcome, timeSpan, retryAttempt, context) =>
                 {
                     logger.LogWarning(
-                        "Retry {RetryAttempt} after {RetryDelay} seconds for UsersService due to {StatusCode}",
+                        "Retry {RetryAttempt} after {RetryDelay} seconds for UsersServiceClient due to {StatusCode}",
                         retryAttempt,
                         timeSpan.TotalSeconds,
                         outcome.Result.StatusCode);
@@ -34,11 +42,10 @@ public static class HttpPolicies
         return policy;
     }
 
-    public static IAsyncPolicy<HttpResponseMessage> GetUsersServiceCircuitBreakerPolicy(IServiceProvider sp)
+    public static IAsyncPolicy<HttpResponseMessage> GetCircuitBreakerPolicy(ILogger<UsersServiceClient> logger)
     {
-        var logger = sp.GetRequiredService<ILogger<UsersServiceClient>>();
         var policy = Policy
-            .HandleResult<HttpResponseMessage>(r => 
+            .HandleResult<HttpResponseMessage>(r =>
                 !r.IsSuccessStatusCode && r.StatusCode != System.Net.HttpStatusCode.NotFound)
             .CircuitBreakerAsync(
                 handledEventsAllowedBeforeBreaking: CircuitBreakerThreshold,
@@ -46,19 +53,18 @@ public static class HttpPolicies
                 onBreak: (outcome, durationOfBreak) =>
                 {
                     logger.LogWarning(
-                        "Circuit breaker for UsersService opened for {Duration}s after {Attempts} failed attempts. Last status: {StatusCode}",
-                        durationOfBreak,
+                        "Circuit breaker for UsersServiceClient opened for {Duration}s after {Attempts} failed attempts. Last status: {StatusCode}",
+                        durationOfBreak.TotalSeconds,
                         CircuitBreakerThreshold,
                         outcome.Result.StatusCode);
                 },
                 onReset: () =>
                 {
-                    logger.LogInformation(
-                        "Circuit breaker for UsersService reset — requests are allowed again.");
+                    logger.LogInformation("Circuit breaker for UsersServiceClient reset — requests are allowed again.");
                 },
                 onHalfOpen: () =>
                 {
-                    logger.LogInformation("Circuit breaker for UsersService is half-open — testing next request...");
+                    logger.LogInformation("Circuit breaker for UsersServiceClient is half-open — testing next request...");
                 });
 
         return policy;
