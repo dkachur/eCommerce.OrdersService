@@ -1,6 +1,7 @@
 ﻿using eCommerce.OrdersService.Application.DTOs;
 using eCommerce.OrdersService.Application.ServiceContracts;
 using Microsoft.Extensions.Logging;
+using Polly.CircuitBreaker;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -10,6 +11,13 @@ public class UsersServiceClient : IUsersServiceClient
 {
     private readonly HttpClient _httpClient;
     private readonly ILogger<UsersServiceClient> _logger;
+
+    private const string UnavailableText = "Temporarily unavailable";
+    private static readonly UserDto DefaultUser = new(
+        Guid.Empty,
+        UnavailableText,
+        UnavailableText,
+        UnavailableText);
 
     public UsersServiceClient(HttpClient httpClient, ILogger<UsersServiceClient> logger)
     {
@@ -34,21 +42,18 @@ public class UsersServiceClient : IUsersServiceClient
                 inner: null,
                 statusCode: HttpStatusCode.ServiceUnavailable);
         }
+        catch (BrokenCircuitException ex)
+        {
+            _logger.LogError(ex, "Error while sending request to Users microservice.");
+
+            return DefaultUser;
+        }
 
         if (response.StatusCode == HttpStatusCode.NotFound)
             return null;
 
         if (!response.IsSuccessStatusCode)
-            return new UserDto(
-                UserId: Guid.Empty,
-                Email: "Temporarily unavailable",
-                PersonName: "Temporarily unavailable",
-                Gender: "Temporarily unavailable");
-
-            //throw new HttpRequestException(
-            //    message: "Users Service responded with an error.",
-            //    inner: null,
-            //    statusCode: HttpStatusCode.InternalServerError);
+            return DefaultUser;
 
         return await response.Content.ReadFromJsonAsync<UserDto>(ct);
     }
