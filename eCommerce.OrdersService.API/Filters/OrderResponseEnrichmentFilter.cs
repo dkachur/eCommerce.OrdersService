@@ -1,7 +1,5 @@
 ﻿using eCommerce.OrdersService.API.DTOs;
 using eCommerce.OrdersService.API.Enrichers;
-using eCommerce.OrdersService.API.Enrichers.Products;
-using eCommerce.OrdersService.API.Enrichers.Users;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 

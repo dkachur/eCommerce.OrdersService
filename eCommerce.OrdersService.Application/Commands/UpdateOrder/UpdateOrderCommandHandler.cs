@@ -39,8 +39,8 @@ public class UpdateOrderCommandHandler : IRequestHandler<UpdateOrderCommand, Res
         if (!validRes.IsValid)
             return Result.Fail<OrderDto>(validRes.ToValidationErrors());
 
-        var userRes = await _usersServiceClient.GetUserAsync(updateOrder.UserId, ct);
-        if (userRes is null)
+        var userExist = await _usersServiceClient.CheckUserExistsAsync(updateOrder.UserId, ct);
+        if (!userExist)
             return Result.Fail<OrderDto>(InvalidUserIdError.WithId(updateOrder.UserId));
 
         var productsExistRes = await _productsServiceClient

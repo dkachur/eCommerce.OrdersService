@@ -1,5 +1,4 @@
-﻿using AutoMapper;
-using eCommerce.OrdersService.API.DTOs;
+﻿using eCommerce.OrdersService.API.DTOs;
 using eCommerce.OrdersService.Application.DTOs;
 using eCommerce.OrdersService.Application.ServiceContracts;
 
@@ -8,12 +7,10 @@ namespace eCommerce.OrdersService.API.Enrichers.Users;
 public class OrderUserEnricher : IOrderUserEnricher
 {
     private readonly IUsersServiceClient _usersServiceClient;
-    private readonly IMapper _mapper;
 
-    public OrderUserEnricher(IUsersServiceClient usersServiceClient, IMapper mapper)
+    public OrderUserEnricher(IUsersServiceClient usersServiceClient)
     {
         _usersServiceClient = usersServiceClient;
-        _mapper = mapper;
     }
 
     public async Task<OrderResponse> EnrichAsync(OrderResponse response, CancellationToken ct = default)

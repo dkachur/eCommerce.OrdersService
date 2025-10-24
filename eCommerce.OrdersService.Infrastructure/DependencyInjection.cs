@@ -10,9 +10,11 @@ using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Repositories;
 using eCommerce.OrdersService.Infrastructure.Policies;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
+using Polly;
 
 namespace eCommerce.OrdersService.Infrastructure;
 
@@ -87,14 +89,27 @@ public static class DependencyInjection
             opt.Port = config["USERSERVICE_PORT"]!;
         });
 
-        services.AddSingleton<UsersMicroservicePolicy>();
+        services.AddKeyedSingleton<IAsyncPolicy<HttpResponseMessage>>(
+            "UsersPolicy",
+            (sp, _) =>
+            {
+                var logger = sp.GetRequiredService<ILogger<UsersServiceClient>>();
+                var policyBuilder = new HttpPolicyBuilder(logger, nameof(UsersServiceClient));
+
+                return policyBuilder
+                    .WithRetry()
+                    .WithCircuitBreaker()
+                    .WithTimeout()
+                    .WithBulkhead()
+                    .Build();
+            });
 
         services.AddHttpClient<IUsersServiceClient, UsersServiceClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<UsersServiceOptions>>().Value;
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
         })
-        .AddPolicyHandler((sp, _) => sp.GetRequiredService<UsersMicroservicePolicy>().Wrap);
+        .AddPolicyHandler((sp, _) => sp.GetRequiredKeyedService<IAsyncPolicy<HttpResponseMessage>>("UsersPolicy"));
 
         return services;
     }
@@ -107,11 +122,27 @@ public static class DependencyInjection
             opt.Port = config["PRODUCTSERVICE_PORT"]!;
         });
 
+        services.AddKeyedSingleton<IAsyncPolicy<HttpResponseMessage>>(
+            "ProductsPolicy",
+            (sp, obj) =>
+            {
+                var logger = sp.GetRequiredService<ILogger<ProductsServiceClient>>();
+                var policyBuilder = new HttpPolicyBuilder(logger, nameof(ProductsServiceClient));
+
+                return policyBuilder
+                    .WithRetry()
+                    .WithCircuitBreaker()
+                    .WithTimeout()
+                    .WithBulkhead()
+                    .Build();
+            });
+
         services.AddHttpClient<IProductsServiceClient, ProductsServiceClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<ProductsServiceOptions>>().Value;
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
-        });
+        })
+        .AddPolicyHandler((sp, _) => sp.GetRequiredKeyedService<IAsyncPolicy<HttpResponseMessage>>("ProductsPolicy"));
 
         return services;
     }

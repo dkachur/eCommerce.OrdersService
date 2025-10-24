@@ -40,8 +40,8 @@ public class AddOrderCommandHandler : IRequestHandler<AddOrderCommand, Result<Or
         if (!validRes.IsValid)
             return Result.Fail<OrderDto>(validRes.ToValidationErrors());
 
-        var userRes = await _usersServiceClient.GetUserAsync(addOrder.UserId, ct);
-        if (userRes is null)
+        var userExist = await _usersServiceClient.CheckUserExistsAsync(addOrder.UserId, ct);
+        if (!userExist)
             return Result.Fail<OrderDto>(InvalidUserIdError.WithId(addOrder.UserId));
 
         var productsExistRes = await _productsServiceClient
