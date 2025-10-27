@@ -1,5 +1,6 @@
 ﻿using eCommerce.OrdersService.Application.RepositoryContracts;
 using eCommerce.OrdersService.Application.ServiceContracts;
+using eCommerce.OrdersService.Infrastructure.Cache;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Products;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Products.Config;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
@@ -139,12 +140,21 @@ public static class DependencyInjection
                     .Build();
             });
 
-        services.AddHttpClient<IProductsServiceClient, ProductsServiceClient>((sp, client) =>
+        services.AddHttpClient<ProductsServiceClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<ProductsServiceOptions>>().Value;
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
         })
         .AddPolicyHandler((sp, _) => sp.GetRequiredKeyedService<IAsyncPolicy<HttpResponseMessage>>("ProductsPolicy"));
+
+        services.AddScoped<IProductsServiceClient, CachedProductsServiceClient>((sp) =>
+        {
+            var inner = sp.GetRequiredService<ProductsServiceClient>();
+            var cache = sp.GetRequiredService<ICacheService>();
+            var logger = sp.GetRequiredService<ILogger<CachedProductsServiceClient>>();
+
+            return new(inner, cache, logger);
+        });
 
         return services;
     }
