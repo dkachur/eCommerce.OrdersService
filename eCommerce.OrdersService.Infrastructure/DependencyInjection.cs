@@ -107,12 +107,21 @@ public static class DependencyInjection
                     .Build();
             });
 
-        services.AddHttpClient<IUsersServiceClient, UsersServiceClient>((sp, client) =>
+        services.AddHttpClient<UsersServiceClient>((sp, client) =>
         {
             var options = sp.GetRequiredService<IOptions<UsersServiceOptions>>().Value;
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
         })
         .AddPolicyHandler((sp, _) => sp.GetRequiredKeyedService<IAsyncPolicy<HttpResponseMessage>>("UsersPolicy"));
+
+        services.AddScoped<IUsersServiceClient, CachedUsersServiceClient>(sp =>
+        {
+            var inner = sp.GetRequiredService<UsersServiceClient>();
+            var cache = sp.GetRequiredService<ICacheService>();
+            var logger = sp.GetRequiredService<ILogger<CachedUsersServiceClient>>();
+
+            return new(inner, cache, logger);
+        });
 
         return services;
     }
@@ -147,7 +156,7 @@ public static class DependencyInjection
         })
         .AddPolicyHandler((sp, _) => sp.GetRequiredKeyedService<IAsyncPolicy<HttpResponseMessage>>("ProductsPolicy"));
 
-        services.AddScoped<IProductsServiceClient, CachedProductsServiceClient>((sp) =>
+        services.AddScoped<IProductsServiceClient, CachedProductsServiceClient>(sp =>
         {
             var inner = sp.GetRequiredService<ProductsServiceClient>();
             var cache = sp.GetRequiredService<ICacheService>();
