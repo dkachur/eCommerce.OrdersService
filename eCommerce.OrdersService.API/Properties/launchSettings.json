@@ -12,7 +12,9 @@
         "USERSERVICE_HOST": "localhost",
         "USERSERVICE_PORT": "9090",
         "PRODUCTSERVICE_HOST": "localhost",
-        "PRODUCTSERVICE_PORT": "9898"
+        "PRODUCTSERVICE_PORT": "9898",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "http://localhost:7979"
@@ -29,7 +31,9 @@
         "USERSERVICE_HOST": "localhost",
         "USERSERVICE_PORT": "9090",
         "PRODUCTSERVICE_HOST": "localhost",
-        "PRODUCTSERVICE_PORT": "9898"
+        "PRODUCTSERVICE_PORT": "9898",
+        "REDIS_HOST": "localhost",
+        "REDIS_PORT": "6379"
       },
       "dotnetRunMessages": true,
       "applicationUrl": "https://localhost:7148;http://localhost:7979"

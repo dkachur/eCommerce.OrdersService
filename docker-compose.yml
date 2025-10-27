@@ -16,6 +16,8 @@ services:
       - USERSERVICE_PORT=8080
       - PRODUCTSERVICE_HOST=ecommerce.productsservice.api
       - PRODUCTSERVICE_PORT=8080
+      - REDIS_HOST=redis
+      - REDIS_PORT=6379 
     ports:
       - "7000:8080"
     depends_on:
@@ -96,6 +98,16 @@ services:
       - ../postgres-init:/docker-entrypoint-initdb.d
     networks:
       - users-network
+
+
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - ../redis-cache:/data
+    networks:
+      - ecommerce-network
 
 
 networks:

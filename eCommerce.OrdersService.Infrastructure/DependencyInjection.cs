@@ -15,6 +15,7 @@ using Microsoft.Extensions.Options;
 using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using Polly;
+using StackExchange.Redis;
 
 namespace eCommerce.OrdersService.Infrastructure;
 
@@ -25,6 +26,7 @@ public static class DependencyInjection
         services.AddAutoMapper(cfg => { }, typeof(OrderItemMappingProfile));
 
         services.AddMongo(config);
+        services.AddRedis(config);
         services.AddUsersServiceClient(config);
         services.AddProductsServiceClient(config);
 
@@ -143,6 +145,19 @@ public static class DependencyInjection
             client.BaseAddress = new Uri($"http://{options.Host}:{options.Port}");
         })
         .AddPolicyHandler((sp, _) => sp.GetRequiredKeyedService<IAsyncPolicy<HttpResponseMessage>>("ProductsPolicy"));
+
+        return services;
+    }
+
+    private static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration config)
+    {
+        var host = config["REDIS_HOST"];
+        var port = config["REDIS_PORT"];
+
+        services.AddSingleton<IConnectionMultiplexer>(_ =>
+            ConnectionMultiplexer.Connect($"{host}:{port}"));
+
+        services.AddSingleton<ICacheService, RedisCacheService>();
 
         return services;
     }
