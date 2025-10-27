@@ -10,17 +10,11 @@ public class CachedProductsServiceClient : IProductsServiceClient
     private readonly IProductsServiceClient _inner;
     private readonly ICacheService _cache;
     private readonly ILogger<CachedProductsServiceClient> _logger;
+
     private const string ExistsKeyPrefix = "product-exists:";
     private const string InfoKeyPrefix = "product-info:";
     private readonly TimeSpan ExistsTtl = TimeSpan.FromMinutes(1);
     private readonly TimeSpan InfoTtl = TimeSpan.FromMinutes(5);
-    private const string NoInfo = "No Info";
-    private static readonly ProductDto FallbackProductTemplate = new(
-        Guid.Empty,
-        NoInfo,
-        NoInfo,
-        default,
-        default);
 
     public CachedProductsServiceClient(IProductsServiceClient inner, ICacheService cache, ILogger<CachedProductsServiceClient> logger)
     {
@@ -70,7 +64,7 @@ public class CachedProductsServiceClient : IProductsServiceClient
                 if (freshResults.TryGetValue(kvp.Key, out var value))
                     return value;
 
-                _logger.LogWarning("Product {ProductId} missing in fresh results for existence check", kvp.Key);
+                _logger.LogWarning("Product {ProductId} not found in inner service results", kvp.Key);
 
                 return default; // treat as non-existent if missing in both cache and fresh results
             });
@@ -117,20 +111,16 @@ public class CachedProductsServiceClient : IProductsServiceClient
             if (freshDict.TryGetValue(kvp.Key, out var value))
                 return value;
 
-            _logger.LogWarning("Product {ProductId} missing in fresh results for product info", kvp.Key);
-            return CreateFallback(kvp.Key);
-        }).ToList();
+            _logger.LogWarning("Product {ProductId} not found in inner service results", kvp.Key);
+            return null;
+        }).OfType<ProductDto>().ToList();
 
         return result;
     }
 
-    private static Guid ExtractIdFromKey(string key, string prefix)
-        => Guid.Parse(key.AsSpan(prefix.Length));
-
-
     private static string CreateKey(Guid id, string prefix)
         => $"{prefix}{id}";
 
-    private static ProductDto CreateFallback(Guid id)
-        => FallbackProductTemplate with { Id = id };
+    private static Guid ExtractIdFromKey(string key, string prefix)
+        => Guid.Parse(key.AsSpan(prefix.Length));
 }
