@@ -88,8 +88,8 @@ public static class DependencyInjection
     {
         services.Configure<UsersServiceOptions>(opt =>
         {
-            opt.Host = config["USERSERVICE_HOST"]!;
-            opt.Port = config["USERSERVICE_PORT"]!;
+            opt.Host = config["APIGATEWAY_HOST"]!;
+            opt.Port = config["APIGATEWAY_PORT"]!;
         });
 
         services.AddKeyedSingleton<IAsyncPolicy<HttpResponseMessage>>(
@@ -101,7 +101,7 @@ public static class DependencyInjection
 
                 return policyBuilder
                     .WithRetry()
-                    .WithCircuitBreaker()
+                    //.WithCircuitBreaker()
                     .WithTimeout()
                     .WithBulkhead()
                     .Build();
@@ -130,8 +130,8 @@ public static class DependencyInjection
     {
         services.Configure<ProductsServiceOptions>(opt =>
         {
-            opt.Host = config["PRODUCTSERVICE_HOST"]!;
-            opt.Port = config["PRODUCTSERVICE_PORT"]!;
+            opt.Host = config["APIGATEWAY_HOST"]!;
+            opt.Port = config["APIGATEWAY_PORT"]!;
         });
 
         services.AddKeyedSingleton<IAsyncPolicy<HttpResponseMessage>>(
@@ -142,8 +142,8 @@ public static class DependencyInjection
                 var policyBuilder = new HttpPolicyBuilder(logger, nameof(ProductsServiceClient));
 
                 return policyBuilder
-                    .WithRetry()
-                    .WithCircuitBreaker()
+                    .WithRetry(initialDelaySeconds: 1.1)
+                    //.WithCircuitBreaker()
                     .WithTimeout()
                     .WithBulkhead()
                     .Build();

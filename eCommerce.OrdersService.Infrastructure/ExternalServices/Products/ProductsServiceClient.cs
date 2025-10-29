@@ -15,7 +15,7 @@ public class ProductsServiceClient : IProductsServiceClient
     private readonly HttpClient _httpClient;
     private readonly ILogger<ProductsServiceClient> _logger;
 
-    private const string ProductsEndpoint = "/api/products";
+    private const string ProductsEndpoint = "/gateway/products";
     private const string UnavailableText = "Temporarily unavailable";
     private static readonly ProductDto FallbackProductTemplate = new(
         Guid.Empty,

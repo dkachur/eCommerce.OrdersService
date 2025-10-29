@@ -14,7 +14,7 @@ public class UsersServiceClient : IUsersServiceClient
     private readonly HttpClient _httpClient;
     private readonly ILogger<UsersServiceClient> _logger;
 
-    private const string UsersEndpoint = "/api/users";
+    private const string UsersEndpoint = "/gateway/users";
     private const string UnavailableText = "Temporarily unavailable";
     private static readonly UserDto FallbackUserTemplate = new(
         Guid.Empty,

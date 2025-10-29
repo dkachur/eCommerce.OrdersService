@@ -46,7 +46,7 @@ public class CachedUsersServiceClient : IUsersServiceClient
         var cached = await _cache.GetAsync<UserDto?>(key, ct);
         if (cached is not null)
         {
-            _logger.LogInformation("User info for {UserId} loaded from cache", userId);
+            _logger.LogDebug("User info for {UserId} loaded from cache", userId);
             return cached;
         }
 
