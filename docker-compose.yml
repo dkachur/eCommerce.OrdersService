@@ -24,6 +24,7 @@ services:
       - "7000:8080"
     depends_on:
       - mongo
+      - rabbitmq
     networks:
       - orders-network
       - ecommerce-network
@@ -59,6 +60,7 @@ services:
       - "6001:8080"
     depends_on:
       - mysql
+      - rabbitmq
     networks:
       - products-network
       - ecommerce-network
