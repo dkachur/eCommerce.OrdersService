@@ -15,13 +15,14 @@ services:
       - APIGATEWAY_HOST=ecommerce.apigateway
       - APIGATEWAY_PORT=8080
       - REDIS_HOST=redis
-      - REDIS_PORT=6379 
+      - REDIS_PORT=6379
       - RABBITMQ_USER=${RABBITMQ_USER}
       - RABBITMQ_PASS=${RABBITMQ_PASS}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
       - RABBITMQ_PRODUCTS_EXCHANGE=products.events.exchange
       - RABBITMQ_PRODUCT_NAME_UPDATED_ROUTING_KEY=product.name.updated
+      - RABBITMQ_PRODUCT_DELETED_ROUTING_KEY=product.deleted 
     ports:
       - "7000:8080"
     depends_on:
@@ -60,6 +61,7 @@ services:
       - RABBITMQ_PORT=5672
       - RABBITMQ_PRODUCTS_EXCHANGE=products.events.exchange
       - RABBITMQ_PRODUCT_NAME_UPDATED_ROUTING_KEY=product.name.updated
+      - RABBITMQ_PRODUCT_DELETED_ROUTING_KEY=product.deleted 
     ports:
       - "6001:8080"
     depends_on:

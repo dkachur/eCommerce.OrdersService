@@ -199,6 +199,7 @@ public static class DependencyInjection
             Password = config["RABBITMQ_PASS"] ?? "password",
             ProductsExchange = config["RABBITMQ_PRODUCTS_EXCHANGE"] ?? "products.exchange",
             ProductNameUpdatedRoutingKey = config["RABBITMQ_PRODUCT_NAME_UPDATED_ROUTING_KEY"] ?? "product.name.updated",
+            ProductDeletedRoutingKey = config["RABBITMQ_PRODUCT_DELETED_ROUTING_KEY"] ?? "product.deleted"
         };
 
         services.Configure<RabbitMqOptions>((opt) =>
@@ -209,14 +210,17 @@ public static class DependencyInjection
             opt.Password = options.Password;
             opt.ProductsExchange = options.ProductsExchange;
             opt.ProductNameUpdatedRoutingKey = options.ProductNameUpdatedRoutingKey;
+            opt.ProductDeletedRoutingKey = options.ProductDeletedRoutingKey;
         });
 
         services.AddSingleton<IRabbitMqConnectionManager, RabbitMqConnectionManager>();
         services.AddHostedService<RabbitMqConnectionHostedService>();
         services.AddTransient<IMessageHandler<ProductNameUpdatedMessage>, ProductNameUpdatedHandler>();
+        services.AddTransient<IMessageHandler<ProductDeletedMessage>, ProductDeletedHandler>();
         services.AddSingleton<IMessageConsumer<ProductNameUpdatedMessage>, RabbitMqProductNameUpdatedConsumer>();
+        services.AddSingleton<IMessageConsumer<ProductDeletedMessage>, RabbitMqProductDeletedConsumer>();
         services.AddHostedService<RabbitMqConsumersHostedService>();
 
         return services;
-}
+    }
 }
