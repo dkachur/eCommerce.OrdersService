@@ -7,6 +7,9 @@ using eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Users.Config;
 using eCommerce.OrdersService.Infrastructure.MappingProfiles;
 using eCommerce.OrdersService.Infrastructure.Messaging.ConnectionManagers;
+using eCommerce.OrdersService.Infrastructure.Messaging.Consumers;
+using eCommerce.OrdersService.Infrastructure.Messaging.DTO;
+using eCommerce.OrdersService.Infrastructure.Messaging.Handlers;
 using eCommerce.OrdersService.Infrastructure.Messaging.HostedServices;
 using eCommerce.OrdersService.Infrastructure.Messaging.Interfaces;
 using eCommerce.OrdersService.Infrastructure.Messaging.Options;
@@ -194,6 +197,8 @@ public static class DependencyInjection
             Port = Convert.ToInt32(config["RABBITMQ_PORT"]),
             Username = config["RABBITMQ_USER"] ?? "guest",
             Password = config["RABBITMQ_PASS"] ?? "password",
+            ProductsExchange = config["RABBITMQ_PRODUCTS_EXCHANGE"] ?? "products.exchange",
+            ProductNameUpdatedRoutingKey = config["RABBITMQ_PRODUCT_NAME_UPDATED_ROUTING_KEY"] ?? "product.name.updated",
         };
 
         services.Configure<RabbitMqOptions>((opt) =>
@@ -202,10 +207,15 @@ public static class DependencyInjection
             opt.Port = options.Port;
             opt.Username = options.Username;
             opt.Password = options.Password;
+            opt.ProductsExchange = options.ProductsExchange;
+            opt.ProductNameUpdatedRoutingKey = options.ProductNameUpdatedRoutingKey;
         });
 
         services.AddSingleton<IRabbitMqConnectionManager, RabbitMqConnectionManager>();
         services.AddHostedService<RabbitMqConnectionHostedService>();
+        services.AddTransient<IMessageHandler<ProductNameUpdatedMessage>, ProductNameUpdatedHandler>();
+        services.AddSingleton<IMessageConsumer<ProductNameUpdatedMessage>, RabbitMqProductNameUpdatedConsumer>();
+        services.AddHostedService<RabbitMqConsumersHostedService>();
 
         return services;
 }

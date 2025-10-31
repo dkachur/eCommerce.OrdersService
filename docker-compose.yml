@@ -20,6 +20,8 @@ services:
       - RABBITMQ_PASS=${RABBITMQ_PASS}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
+      - RABBITMQ_PRODUCTS_EXCHANGE=products.events.exchange
+      - RABBITMQ_PRODUCT_NAME_UPDATED_ROUTING_KEY=product.name.updated
     ports:
       - "7000:8080"
     depends_on:
@@ -56,6 +58,8 @@ services:
       - RABBITMQ_PASS=${RABBITMQ_PASS}
       - RABBITMQ_HOST=rabbitmq
       - RABBITMQ_PORT=5672
+      - RABBITMQ_PRODUCTS_EXCHANGE=products.events.exchange
+      - RABBITMQ_PRODUCT_NAME_UPDATED_ROUTING_KEY=product.name.updated
     ports:
       - "6001:8080"
     depends_on:
