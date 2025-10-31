@@ -6,6 +6,10 @@ using eCommerce.OrdersService.Infrastructure.ExternalServices.Products.Config;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Users.Config;
 using eCommerce.OrdersService.Infrastructure.MappingProfiles;
+using eCommerce.OrdersService.Infrastructure.Messaging.ConnectionManagers;
+using eCommerce.OrdersService.Infrastructure.Messaging.HostedServices;
+using eCommerce.OrdersService.Infrastructure.Messaging.Interfaces;
+using eCommerce.OrdersService.Infrastructure.Messaging.Options;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Config;
 using eCommerce.OrdersService.Infrastructure.Persistence.Mongo.Repositories;
 using eCommerce.OrdersService.Infrastructure.Policies;
@@ -30,6 +34,7 @@ public static class DependencyInjection
         services.AddRedis(config);
         services.AddUsersServiceClient(config);
         services.AddProductsServiceClient(config);
+        services.AddRabbitMq(config);
 
         services.AddScoped<IOrdersRepository, OrdersRepository>();
 
@@ -180,4 +185,28 @@ public static class DependencyInjection
 
         return services;
     }
+
+    private static IServiceCollection AddRabbitMq(this IServiceCollection services, IConfiguration config)
+    {
+        var options = new RabbitMqOptions()
+        {
+            Host = config["RABBITMQ_HOST"] ?? "localhost",
+            Port = Convert.ToInt32(config["RABBITMQ_PORT"]),
+            Username = config["RABBITMQ_USER"] ?? "guest",
+            Password = config["RABBITMQ_PASS"] ?? "password",
+        };
+
+        services.Configure<RabbitMqOptions>((opt) =>
+        {
+            opt.Host = options.Host;
+            opt.Port = options.Port;
+            opt.Username = options.Username;
+            opt.Password = options.Password;
+        });
+
+        services.AddSingleton<IRabbitMqConnectionManager, RabbitMqConnectionManager>();
+        services.AddHostedService<RabbitMqConnectionHostedService>();
+
+        return services;
+}
 }

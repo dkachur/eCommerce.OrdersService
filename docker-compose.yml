@@ -16,6 +16,10 @@ services:
       - APIGATEWAY_PORT=8080
       - REDIS_HOST=redis
       - REDIS_PORT=6379 
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
     ports:
       - "7000:8080"
     depends_on:
@@ -47,6 +51,10 @@ services:
       - MYSQL_HOST=mysql
       - MYSQL_PORT=3306
       - MYSQL_DB=ecommerceproducts
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
     ports:
       - "6001:8080"
     depends_on:
@@ -77,6 +85,10 @@ services:
       - POSTGRES_HOST=postgres
       - POSTGRES_PORT=5432
       - POSTGRES_DB=eCommerceUsers
+      - RABBITMQ_USER=${RABBITMQ_USER}
+      - RABBITMQ_PASS=${RABBITMQ_PASS}
+      - RABBITMQ_HOST=rabbitmq
+      - RABBITMQ_PORT=5672
     ports:
       - "5000:8080"
     depends_on:
@@ -112,6 +124,18 @@ services:
     image: ecommerce.apigateway:latest
     ports:
       - "8000:8080"
+    networks:
+      - ecommerce-network
+
+
+  rabbitmq:
+    image: rabbitmq:management
+    environment:
+      - RABBITMQ_DEFAULT_USER=${RABBITMQ_USER}
+      - RABBITMQ_DEFAULT_PASS=${RABBITMQ_PASS}
+    ports:
+      - "5672:5672"
+      - "15672:15672"
     networks:
       - ecommerce-network
 
