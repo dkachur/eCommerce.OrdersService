@@ -1,4 +1,4 @@
-﻿namespace eCommerce.OrdersService.Infrastructure.Cache;
+﻿namespace eCommerce.OrdersService.Infrastructure.Caching.Interfaces;
 
 public interface ICacheService
 {

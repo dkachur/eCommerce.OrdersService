@@ -1,7 +1,8 @@
-﻿using StackExchange.Redis;
+﻿using eCommerce.OrdersService.Infrastructure.Caching.Interfaces;
+using StackExchange.Redis;
 using System.Text.Json;
 
-namespace eCommerce.OrdersService.Infrastructure.Cache;
+namespace eCommerce.OrdersService.Infrastructure.Caching.Providers;
 
 public class RedisCacheService : ICacheService
 {

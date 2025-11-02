@@ -1,6 +1,6 @@
 ﻿using eCommerce.OrdersService.Application.DTOs;
 using eCommerce.OrdersService.Application.ServiceContracts;
-using eCommerce.OrdersService.Infrastructure.Cache;
+using eCommerce.OrdersService.Infrastructure.Caching.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace eCommerce.OrdersService.Infrastructure.ExternalServices.Products;
@@ -8,28 +8,22 @@ namespace eCommerce.OrdersService.Infrastructure.ExternalServices.Products;
 public class CachedProductsServiceClient : IProductsServiceClient
 {
     private readonly IProductsServiceClient _inner;
-    private readonly ICacheService _cache;
+    private readonly IProductCacheService _cache;
     private readonly ILogger<CachedProductsServiceClient> _logger;
 
-    private const string ExistsKeyPrefix = "product-exists:";
-    private const string InfoKeyPrefix = "product-info:";
-    private readonly TimeSpan ExistsTtl = TimeSpan.FromMinutes(1);
-    private readonly TimeSpan InfoTtl = TimeSpan.FromMinutes(5);
-
-    public CachedProductsServiceClient(IProductsServiceClient inner, ICacheService cache, ILogger<CachedProductsServiceClient> logger)
+    public CachedProductsServiceClient(
+        IProductsServiceClient inner, 
+        IProductCacheService productCache, 
+        ILogger<CachedProductsServiceClient> logger)
     {
         _inner = inner;
-        _cache = cache;
+        _cache = productCache;
         _logger = logger;
     }
 
     public async Task<Dictionary<Guid, bool>> CheckProductsExistAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
     {
-        var keys = ids.Select(id => CreateKey(id, ExistsKeyPrefix));
-        var cachedRaw = await _cache.GetManyAsync<bool?>(keys, ct);
-        var cached = cachedRaw.ToDictionary(
-            kvp => ExtractIdFromKey(kvp.Key, ExistsKeyPrefix),
-            kvp => kvp.Value);
+        var cached = await _cache.GetProductsExistsAsync(ids, ct).ConfigureAwait(false);
 
         var uncachedIds = cached
             .Where(kvp => kvp.Value is null)
@@ -45,15 +39,11 @@ public class CachedProductsServiceClient : IProductsServiceClient
                 kvp => kvp.Value!.Value);
         }
 
-        _logger.LogInformation("Cache miss for {Count} product exists checks", uncachedIds.Count);
+        _logger.LogDebug("Cache miss for {Count} product exists checks", uncachedIds.Count);
 
-        var freshResults = await _inner.CheckProductsExistAsync(uncachedIds, ct);
+        var freshResults = await _inner.CheckProductsExistAsync(uncachedIds, ct).ConfigureAwait(false);
 
-        await _cache.SetManyAsync(
-            freshResults.ToDictionary(
-                kvp => CreateKey(kvp.Key, ExistsKeyPrefix),
-                kvp => kvp.Value),
-            ExistsTtl, ct);
+        await _cache.CacheProductsExistsAsync(freshResults, ct).ConfigureAwait(false);
 
         var result = cached.ToDictionary(
             kvp => kvp.Key,
@@ -74,11 +64,7 @@ public class CachedProductsServiceClient : IProductsServiceClient
 
     public async Task<List<ProductDto>> GetProductInfosAsync(IEnumerable<Guid> productIds, CancellationToken ct = default)
     {
-        var keys = productIds.Select(id => CreateKey(id, InfoKeyPrefix));
-        var cachedRaw = await _cache.GetManyAsync<ProductDto>(keys, ct);
-        var cached = cachedRaw.ToDictionary(
-            kvp => ExtractIdFromKey(kvp.Key, InfoKeyPrefix),
-            kvp => kvp.Value);
+        var cached = await _cache.GetProductInfosAsync(productIds, ct).ConfigureAwait(false);
 
         var uncachedIds = cached
             .Where(kvp => kvp.Value is null)
@@ -91,17 +77,13 @@ public class CachedProductsServiceClient : IProductsServiceClient
             return cached.Values.OfType<ProductDto>().ToList();
         }
 
-        _logger.LogInformation("Cache miss for {Count} product infos", uncachedIds.Count);
+        _logger.LogDebug("Cache miss for {Count} product infos", uncachedIds.Count);
 
-        var freshResults = await _inner.GetProductsInfoAsync(uncachedIds, ct);
+        var freshResults = await _inner.GetProductInfosAsync(uncachedIds, ct).ConfigureAwait(false);
+        await _cache.CacheProductInfosAsync(freshResults, ct).ConfigureAwait(false);
+
         var freshDict = freshResults
             .ToDictionary(p => p.Id, p => p);
-
-        await _cache.SetManyAsync(
-            freshDict.ToDictionary(
-                kvp => CreateKey(kvp.Key, InfoKeyPrefix),
-                kvp => kvp.Value),
-            InfoTtl, ct);
 
         var result = cached.Select(kvp =>
         {
@@ -117,10 +99,4 @@ public class CachedProductsServiceClient : IProductsServiceClient
 
         return result;
     }
-
-    private static string CreateKey(Guid id, string prefix)
-        => $"{prefix}{id}";
-
-    private static Guid ExtractIdFromKey(string key, string prefix)
-        => Guid.Parse(key.AsSpan(prefix.Length));
 }

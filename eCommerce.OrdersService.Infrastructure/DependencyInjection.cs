@@ -1,6 +1,8 @@
 ﻿using eCommerce.OrdersService.Application.RepositoryContracts;
 using eCommerce.OrdersService.Application.ServiceContracts;
-using eCommerce.OrdersService.Infrastructure.Cache;
+using eCommerce.OrdersService.Infrastructure.Caching.Interfaces;
+using eCommerce.OrdersService.Infrastructure.Caching.Providers;
+using eCommerce.OrdersService.Infrastructure.Caching.Services;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Products;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Products.Config;
 using eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
@@ -125,7 +127,7 @@ public static class DependencyInjection
         services.AddScoped<IUsersServiceClient, CachedUsersServiceClient>(sp =>
         {
             var inner = sp.GetRequiredService<UsersServiceClient>();
-            var cache = sp.GetRequiredService<ICacheService>();
+            var cache = sp.GetRequiredService<IUserCacheService>();
             var logger = sp.GetRequiredService<ILogger<CachedUsersServiceClient>>();
 
             return new(inner, cache, logger);
@@ -167,7 +169,7 @@ public static class DependencyInjection
         services.AddScoped<IProductsServiceClient, CachedProductsServiceClient>(sp =>
         {
             var inner = sp.GetRequiredService<ProductsServiceClient>();
-            var cache = sp.GetRequiredService<ICacheService>();
+            var cache = sp.GetRequiredService<IProductCacheService>();
             var logger = sp.GetRequiredService<ILogger<CachedProductsServiceClient>>();
 
             return new(inner, cache, logger);
@@ -185,6 +187,8 @@ public static class DependencyInjection
             ConnectionMultiplexer.Connect($"{host}:{port}"));
 
         services.AddSingleton<ICacheService, RedisCacheService>();
+        services.AddSingleton<IUserCacheService, UserCacheService>();
+        services.AddSingleton<IProductCacheService, ProductCacheService>();
 
         return services;
     }

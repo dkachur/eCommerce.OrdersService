@@ -1,6 +1,6 @@
 ﻿using eCommerce.OrdersService.Application.DTOs;
 using eCommerce.OrdersService.Application.ServiceContracts;
-using eCommerce.OrdersService.Infrastructure.Cache;
+using eCommerce.OrdersService.Infrastructure.Caching.Interfaces;
 using Microsoft.Extensions.Logging;
 
 namespace eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
@@ -8,15 +8,13 @@ namespace eCommerce.OrdersService.Infrastructure.ExternalServices.Users;
 public class CachedUsersServiceClient : IUsersServiceClient
 {
     private readonly IUsersServiceClient _inner;
-    private readonly ICacheService _cache;
+    private readonly IUserCacheService _cache;
     private readonly ILogger<CachedUsersServiceClient> _logger;
 
-    private const string ExistsKeyPrefix = "user-exists:";
-    private const string InfoKeyPrefix = "user-info:";
-    private static readonly TimeSpan ExistsTtl = TimeSpan.FromMinutes(1);
-    private static readonly TimeSpan InfoTtl = TimeSpan.FromMinutes(5);
-
-    public CachedUsersServiceClient(IUsersServiceClient inner, ICacheService cache, ILogger<CachedUsersServiceClient> logger)
+    public CachedUsersServiceClient(
+        IUsersServiceClient inner,
+        IUserCacheService cache,
+        ILogger<CachedUsersServiceClient> logger)
     {
         _inner = inner;
         _cache = cache;
@@ -25,8 +23,7 @@ public class CachedUsersServiceClient : IUsersServiceClient
 
     public async Task<bool> CheckUserExistsAsync(Guid userId, CancellationToken ct = default)
     {
-        var key = CreateKey(userId, ExistsKeyPrefix);
-        var cached = await _cache.GetAsync<bool?>(key, ct);
+        var cached = await _cache.GetUserExistsAsync(userId, ct).ConfigureAwait(false);
         if (cached is not null)
         {
             _logger.LogInformation("User exists flag for {UserId} loaded from cache", userId);
@@ -35,15 +32,14 @@ public class CachedUsersServiceClient : IUsersServiceClient
 
         _logger.LogInformation("Cache miss for {UserId} user existence check", userId);
 
-        var fresh = await _inner.CheckUserExistsAsync(userId, ct);
-        await _cache.SetAsync(key, fresh, ExistsTtl, ct);
+        var fresh = await _inner.CheckUserExistsAsync(userId, ct).ConfigureAwait(false);
+        await _cache.CacheUserExistsAsync(userId, fresh, ct).ConfigureAwait(false);
         return fresh;
     }
 
     public async Task<UserDto?> GetUserAsync(Guid userId, CancellationToken ct = default)
     {
-        var key = CreateKey(userId, InfoKeyPrefix);
-        var cached = await _cache.GetAsync<UserDto?>(key, ct);
+        var cached = await _cache.GetUserInfoAsync(userId, ct).ConfigureAwait(false);
         if (cached is not null)
         {
             _logger.LogDebug("User info for {UserId} loaded from cache", userId);
@@ -52,20 +48,17 @@ public class CachedUsersServiceClient : IUsersServiceClient
 
         _logger.LogInformation("Cache miss for {UserId} user info", userId);
 
-        var fresh = await _inner.GetUserAsync(userId, ct);
-        await _cache.SetAsync(key, fresh, InfoTtl, ct);
+        var fresh = await _inner.GetUserAsync(userId, ct).ConfigureAwait(false);
+
+        if (fresh is not null)
+            await _cache.CacheUserInfoAsync(fresh, ct).ConfigureAwait(false);
+
         return fresh;
     }
 
     public async Task<List<UserDto>> GetUsersByIdsAsync(IEnumerable<Guid> userIds, CancellationToken ct = default)
     {
-        var keys = userIds
-            .Select(id => CreateKey(id, InfoKeyPrefix));
-
-        var cachedRaw = await _cache.GetManyAsync<UserDto?>(keys, ct);
-        var cached = cachedRaw.ToDictionary(
-            kvp => ExtractIdFromKey(kvp.Key, InfoKeyPrefix),
-            kvp => kvp.Value);
+        var cached = await _cache.GetUserInfosAsync(userIds, ct).ConfigureAwait(false);
 
         var uncachedIds = cached
             .Where(kvp => kvp.Value is null)
@@ -81,14 +74,10 @@ public class CachedUsersServiceClient : IUsersServiceClient
         _logger.LogInformation("Cache miss for {Count} user infos", uncachedIds.Count);
 
         var freshResults = await _inner.GetUsersByIdsAsync(uncachedIds, ct);
+        await _cache.CacheUserInfosAsync(freshResults, ct).ConfigureAwait(false);
+
         var freshDict = freshResults
             .ToDictionary(user => user.UserId, user => user);
-
-        await _cache.SetManyAsync(
-            freshDict.ToDictionary(
-                kvp => CreateKey(kvp.Key, InfoKeyPrefix), 
-                kvp => kvp.Value), 
-            InfoTtl, ct);
 
         var result = cached.Select(kvp =>
         {
@@ -104,10 +93,4 @@ public class CachedUsersServiceClient : IUsersServiceClient
 
         return result;
     }
-
-    private static string CreateKey(Guid id, string prefix)
-        => $"{prefix}{id}";
-
-    private static Guid ExtractIdFromKey(string key, string prefix)
-        => Guid.Parse(key.AsSpan(prefix.Length));
 }
