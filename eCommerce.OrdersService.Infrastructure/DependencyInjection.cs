@@ -10,7 +10,7 @@ using eCommerce.OrdersService.Infrastructure.ExternalServices.Users.Config;
 using eCommerce.OrdersService.Infrastructure.MappingProfiles;
 using eCommerce.OrdersService.Infrastructure.Messaging.ConnectionManagers;
 using eCommerce.OrdersService.Infrastructure.Messaging.Consumers;
-using eCommerce.OrdersService.Infrastructure.Messaging.DTO;
+using eCommerce.OrdersService.Infrastructure.Messaging.DTOs;
 using eCommerce.OrdersService.Infrastructure.Messaging.Handlers;
 using eCommerce.OrdersService.Infrastructure.Messaging.HostedServices;
 using eCommerce.OrdersService.Infrastructure.Messaging.Interfaces;
@@ -202,7 +202,7 @@ public static class DependencyInjection
             Username = config["RABBITMQ_USER"] ?? "guest",
             Password = config["RABBITMQ_PASS"] ?? "password",
             ProductsExchange = config["RABBITMQ_PRODUCTS_EXCHANGE"] ?? "products.exchange",
-            ProductNameUpdatedRoutingKey = config["RABBITMQ_PRODUCT_NAME_UPDATED_ROUTING_KEY"] ?? "product.name.updated",
+            ProductUpdatedRoutingKey = config["RABBITMQ_PRODUCT_UPDATED_ROUTING_KEY"] ?? "product.updated",
             ProductDeletedRoutingKey = config["RABBITMQ_PRODUCT_DELETED_ROUTING_KEY"] ?? "product.deleted"
         };
 
@@ -213,15 +213,15 @@ public static class DependencyInjection
             opt.Username = options.Username;
             opt.Password = options.Password;
             opt.ProductsExchange = options.ProductsExchange;
-            opt.ProductNameUpdatedRoutingKey = options.ProductNameUpdatedRoutingKey;
+            opt.ProductUpdatedRoutingKey = options.ProductUpdatedRoutingKey;
             opt.ProductDeletedRoutingKey = options.ProductDeletedRoutingKey;
         });
 
         services.AddSingleton<IRabbitMqConnectionManager, RabbitMqConnectionManager>();
         services.AddHostedService<RabbitMqConnectionHostedService>();
-        services.AddTransient<IMessageHandler<ProductNameUpdatedMessage>, ProductNameUpdatedHandler>();
+        services.AddTransient<IMessageHandler<ProductUpdatedMessage>, ProductUpdatedHandler>();
         services.AddTransient<IMessageHandler<ProductDeletedMessage>, ProductDeletedHandler>();
-        services.AddSingleton<IMessageConsumer<ProductNameUpdatedMessage>, RabbitMqProductNameUpdatedConsumer>();
+        services.AddSingleton<IMessageConsumer<ProductUpdatedMessage>, RabbitMqProductUpdatedConsumer>();
         services.AddSingleton<IMessageConsumer<ProductDeletedMessage>, RabbitMqProductDeletedConsumer>();
         services.AddHostedService<RabbitMqConsumersHostedService>();
 

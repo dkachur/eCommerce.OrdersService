@@ -1,5 +1,5 @@
 ﻿using eCommerce.OrdersService.Infrastructure.Messaging.Constants;
-using eCommerce.OrdersService.Infrastructure.Messaging.DTO;
+using eCommerce.OrdersService.Infrastructure.Messaging.DTOs;
 using eCommerce.OrdersService.Infrastructure.Messaging.Interfaces;
 using eCommerce.OrdersService.Infrastructure.Messaging.Options;
 using Microsoft.Extensions.Logging;

@@ -7,6 +7,6 @@ public class RabbitMqOptions
     public string Username { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
     public string ProductsExchange { get; set; } = string.Empty;
-    public string ProductNameUpdatedRoutingKey { get; set; } = string.Empty;
+    public string ProductUpdatedRoutingKey { get; set; } = string.Empty;
     public string ProductDeletedRoutingKey { get; set; } = string.Empty;
 }

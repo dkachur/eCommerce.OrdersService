@@ -1,15 +1,15 @@
-﻿using eCommerce.OrdersService.Infrastructure.Messaging.DTO;
+﻿using eCommerce.OrdersService.Infrastructure.Messaging.DTOs;
 using eCommerce.OrdersService.Infrastructure.Messaging.Interfaces;
 using Microsoft.Extensions.Hosting;
 
 namespace eCommerce.OrdersService.Infrastructure.Messaging.HostedServices;
 public class RabbitMqConsumersHostedService : IHostedService
 {
-    private readonly IMessageConsumer<ProductNameUpdatedMessage> _productNameUpdatedConsumer;
+    private readonly IMessageConsumer<ProductUpdatedMessage> _productNameUpdatedConsumer;
     private readonly IMessageConsumer<ProductDeletedMessage> _productDeletedConsumer;
 
     public RabbitMqConsumersHostedService(
-        IMessageConsumer<ProductNameUpdatedMessage> productNameUpdatedConsumer, 
+        IMessageConsumer<ProductUpdatedMessage> productNameUpdatedConsumer, 
         IMessageConsumer<ProductDeletedMessage> productDeletedConsumer)
     {
         _productNameUpdatedConsumer = productNameUpdatedConsumer;

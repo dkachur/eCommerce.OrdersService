@@ -1,4 +1,5 @@
-﻿using eCommerce.OrdersService.Infrastructure.Messaging.DTO;
+﻿
+using eCommerce.OrdersService.Infrastructure.Messaging.DTOs;
 using eCommerce.OrdersService.Infrastructure.Messaging.Interfaces;
 using Microsoft.Extensions.Logging;
 

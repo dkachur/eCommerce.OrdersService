@@ -1,5 +1,5 @@
 ﻿using eCommerce.OrdersService.Infrastructure.Messaging.Constants;
-using eCommerce.OrdersService.Infrastructure.Messaging.DTO;
+using eCommerce.OrdersService.Infrastructure.Messaging.DTOs;
 using eCommerce.OrdersService.Infrastructure.Messaging.Interfaces;
 using eCommerce.OrdersService.Infrastructure.Messaging.Options;
 using Microsoft.Extensions.Logging;
@@ -7,14 +7,14 @@ using Microsoft.Extensions.Options;
 
 namespace eCommerce.OrdersService.Infrastructure.Messaging.Consumers;
 
-public class RabbitMqProductNameUpdatedConsumer : RabbitMqConsumerBase<ProductNameUpdatedMessage>
+public class RabbitMqProductUpdatedConsumer : RabbitMqConsumerBase<ProductUpdatedMessage>
 {
     private readonly RabbitMqOptions _options;
 
-    public RabbitMqProductNameUpdatedConsumer(
+    public RabbitMqProductUpdatedConsumer(
         IRabbitMqConnectionManager connectionManager,
-        ILogger<RabbitMqProductNameUpdatedConsumer> logger,
-        IMessageHandler<ProductNameUpdatedMessage> messageHandler,
+        ILogger<RabbitMqProductUpdatedConsumer> logger,
+        IMessageHandler<ProductUpdatedMessage> messageHandler,
         IOptions<RabbitMqOptions> options)
         : base(connectionManager, logger, messageHandler)
     {
@@ -24,7 +24,7 @@ public class RabbitMqProductNameUpdatedConsumer : RabbitMqConsumerBase<ProductNa
     protected override void Configure()
     {
         _exchange = _options.ProductsExchange;
-        _routingKey = _options.ProductNameUpdatedRoutingKey;
-        _queue = RabbitMqConstants.ProductNameUpdatedQueue;
+        _routingKey = _options.ProductUpdatedRoutingKey;
+        _queue = RabbitMqConstants.ProductUpdatedQueue;
     }
 }
