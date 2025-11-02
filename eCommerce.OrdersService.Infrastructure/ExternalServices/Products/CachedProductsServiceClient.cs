@@ -72,7 +72,7 @@ public class CachedProductsServiceClient : IProductsServiceClient
         return result;
     }
 
-    public async Task<List<ProductDto>> GetProductsInfoAsync(IEnumerable<Guid> productIds, CancellationToken ct = default)
+    public async Task<List<ProductDto>> GetProductInfosAsync(IEnumerable<Guid> productIds, CancellationToken ct = default)
     {
         var keys = productIds.Select(id => CreateKey(id, InfoKeyPrefix));
         var cachedRaw = await _cache.GetManyAsync<ProductDto>(keys, ct);

@@ -42,7 +42,7 @@ public class OrderProductEnricher : IOrderProductEnricher
 
     private async Task<Dictionary<Guid, ProductDto>> GetProductsByIdsAsync(IEnumerable<Guid> ids, CancellationToken ct = default)
     {
-        var products = await _productsServiceClient.GetProductsInfoAsync(ids.Distinct(), ct);
+        var products = await _productsServiceClient.GetProductInfosAsync(ids.Distinct(), ct);
         return products
             .ToDictionary(p => p.Id, p => p);
     }

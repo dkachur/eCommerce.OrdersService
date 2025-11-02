@@ -56,7 +56,7 @@ public class ProductsServiceClient : IProductsServiceClient
             onFailure: () => throw CreateUnavailableException("Unable to verify product existence."));
     }
 
-    public async Task<List<ProductDto>> GetProductsInfoAsync(IEnumerable<Guid> productIds, CancellationToken ct = default)
+    public async Task<List<ProductDto>> GetProductInfosAsync(IEnumerable<Guid> productIds, CancellationToken ct = default)
     {
         return await ExecuteSafeAsync(
             operation: async () =>
