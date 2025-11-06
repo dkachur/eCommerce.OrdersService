@@ -1,5 +1,5 @@
 services:
-  ecommerce.ordersservice.api:
+  orders:
     image: orders-microservice
     build:
       context: .
@@ -45,7 +45,7 @@ services:
       - orders-network
 
 
-  ecommerce.productsservice.api:
+  products:
     image: products-microservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
@@ -83,7 +83,7 @@ services:
       - products-network
 
 
-  ecommerce.usersservice.api:
+  users:
     image: users-microservice
     environment:
       - ASPNETCORE_ENVIRONMENT=Development
