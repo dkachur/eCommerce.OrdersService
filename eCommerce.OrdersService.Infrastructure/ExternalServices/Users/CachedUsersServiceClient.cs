@@ -26,11 +26,11 @@ public class CachedUsersServiceClient : IUsersServiceClient
         var cached = await _cache.GetUserExistsAsync(userId, ct).ConfigureAwait(false);
         if (cached is not null)
         {
-            _logger.LogInformation("User exists flag for {UserId} loaded from cache", userId);
+            _logger.LogDebug("User exists flag for {UserId} loaded from cache", userId);
             return cached.Value;
         }
 
-        _logger.LogInformation("Cache miss for {UserId} user existence check", userId);
+        _logger.LogDebug("Cache miss for {UserId} user existence check", userId);
 
         var fresh = await _inner.CheckUserExistsAsync(userId, ct).ConfigureAwait(false);
         await _cache.CacheUserExistsAsync(userId, fresh, ct).ConfigureAwait(false);
@@ -46,7 +46,7 @@ public class CachedUsersServiceClient : IUsersServiceClient
             return cached;
         }
 
-        _logger.LogInformation("Cache miss for {UserId} user info", userId);
+        _logger.LogDebug("Cache miss for {UserId} user info", userId);
 
         var fresh = await _inner.GetUserAsync(userId, ct).ConfigureAwait(false);
 
@@ -71,7 +71,7 @@ public class CachedUsersServiceClient : IUsersServiceClient
             return cached.Values.OfType<UserDto>().ToList();
         }
 
-        _logger.LogInformation("Cache miss for {Count} user infos", uncachedIds.Count);
+        _logger.LogDebug("Cache miss for {Count} user infos", uncachedIds.Count);
 
         var freshResults = await _inner.GetUsersByIdsAsync(uncachedIds, ct);
         await _cache.CacheUserInfosAsync(freshResults, ct).ConfigureAwait(false);
